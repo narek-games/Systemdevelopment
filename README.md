@@ -1,1 +1,1 @@
-# Systemdevelopment
+緑橋書店受注納品管理システム（Bチーム）

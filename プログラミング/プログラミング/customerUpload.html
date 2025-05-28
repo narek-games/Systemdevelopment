@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>顧客情報アップロード画面</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding: 30px;
+    }
+    .upload-area {
+      border: 2px solid black;
+      padding: 50px;
+      margin: 20px auto;
+      width: 600px;
+      height: 200px;
+      position: relative;
+    }
+    .upload-icon {
+      font-size: 60px;
+    }
+    .upload-text {
+      margin-top: 10px;
+      color: #333;
+    }
+    .file-select {
+      margin-top: 20px;
+    }
+    .button {
+      padding: 10px 30px;
+      margin: 20px 10px;
+      font-size: 20px;
+      border-radius: 8px;
+      border: none;
+      background-color: #cfe0ff;
+      cursor: pointer;
+      box-shadow: 2px 2px 2px #999;
+    }
+    .button:active {
+      box-shadow: inset 2px 2px 5px #666;
+    }
+    .file-name {
+      padding: 10px;
+      width: 300px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>顧客情報アップロード画面</h1>
+
+  <div class="upload-area" id="drop-area">
+    <div class="upload-icon">⬆</div>
+    <div class="upload-text">ここにファイルをドラッグ＆ドロップ</div>
+  </div>
+
+  <div class="file-select">
+    <input type="text" class="file-name" placeholder="選択したファイル名選択" readonly id="file-name">
+    <input type="file" id="file-input" style="display: none;">
+    <button class="button" onclick="document.getElementById('file-input').click()">参照</button>
+  </div>
+
+  <div>
+    <a href="./statisticsHome.html"><button class="button">戻る</button></a>
+    <button class="button">アップロード</button>
+  </div>
+
+  <script>
+    const fileInput = document.getElementById('file-input');
+    const fileNameField = document.getElementById('file-name');
+    const dropArea = document.getElementById('drop-area');
+
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files.length > 0) {
+        fileNameField.value = fileInput.files[0].name;
+      }
+    });
+
+    dropArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropArea.style.backgroundColor = '#eef';
+    });
+
+    dropArea.addEventListener('dragleave', () => {
+      dropArea.style.backgroundColor = '';
+    });
+
+    dropArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropArea.style.backgroundColor = '';
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        fileInput.files = files;
+        fileNameField.value = files[0].name;
+      }
+    });
+  </script>
+
+</body>
+</html>

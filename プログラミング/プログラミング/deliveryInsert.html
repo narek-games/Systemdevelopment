@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <title>納品書作成画面</title>
+    <style>
+        body {
+            font-family: "Hiragino Kaku Gothic ProN", sans-serif;
+            background: #f4f4f4;
+            /*padding: 20px;*/
+            background-color: white;
+        }
+
+       
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px 40px;
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        input[type="number"] {
+            width: 100%;
+            padding: 6px;
+            box-sizing: border-box;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+
+        table th,
+        table td {
+            border: 1px solid #999;
+            padding: 8px;
+        }
+
+        .tax-options {
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+        }
+
+        .reset-btn,
+        .submit-btn {
+            width: 150px;
+            padding: 12px;
+            font-size: 16px;
+            background: #dce9f9;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .reset-btn:hover,
+        .submit-btn:hover {
+            background: #bcd4f7;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>納品書作成画面</h1>
+
+        <div class="grid">
+            <div class="form-group">
+                <label>納品ID</label>
+                <input type="text" value="DE000001" readonly>
+            </div>
+            <div class="form-group">
+                <label>日付</label>
+                <input type="date" id="deliveryDate">
+            </div>
+
+            <script>
+                window.addEventListener('DOMContentLoaded', () => {
+                    const today = new Date();
+                    const yyyy = today.getFullYear();
+                    const mm = String(today.getMonth() + 1).padStart(2, '0');
+                    const dd = String(today.getDate()).padStart(2, '0');
+                    document.getElementById('deliveryDate').value = `${yyyy}-${mm}-${dd}`;
+                });
+            </script>
+
+            <div class="form-group">
+                <label>顧客ID</label>
+                <input type="text" value="CU000001" readonly>
+            </div>
+            <div class="form-group">
+                <label>顧客名</label>
+                <input type="text" value="大阪情報専門学校">
+            </div>
+        </div>
+
+        <table border="1" id="itemTable">
+            <thead>
+                <tr>
+                    <th>品名</th>
+                    <th>数量</th>
+                    <th>単価</th>
+                    <th>金額</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="item-row">
+                    <td><input type="text" value="日経コンピュータ11月号"></td>
+                    <td><input type="number" value="1" class="qty" oninput="updateRow(this)"></td>
+                    <td><input type="number" value="1300" class="price" oninput="updateRow(this)" readonly></td>
+                    <td><input type="number" value="1300" class="total" readonly></td>
+                </tr>
+                <tr class="item-row">
+                    <td><input type="text" value="日経コンピュータ11月号"></td>
+                    <td><input type="number" value="2" class="qty" oninput="updateRow(this)"></td>
+                    <td><input type="number" value="1300" class="price" oninput="updateRow(this)" readonly></td>
+                    <td><input type="number" value="3000" class="total" readonly></td>
+                </tr>
+                <tr class="item-row">
+                    <td><input type="text" value=""></td>
+                    <td><input type="number" value="" class="qty" oninput="updateRow(this)"></td>
+                    <td><input type="number" value="" class="price" oninput="updateRow(this)"radio></td>
+                    <td><input type="number" value="" class="total" readonly></td>
+                </tr>
+                <tr class="item-row">
+                    <td><input type="text" value=""></td>
+                    <td><input type="number" value="" class="qty" oninput="updateRow(this)"></td>
+                    <td><input type="number" value="" class="price" oninput="updateRow(this)"readonly></td>
+                    <td><input type="number" value="" class="total" readonly></td>
+                </tr>
+                <tr class="item-row">
+                    <td><input type="text" value=""></td>
+                    <td><input type="number" value="" class="qty" oninput="updateRow(this)"></td>
+                    <td><input type="number" value="" class="price" oninput="updateRow(this)"readonly></td>
+                    <td><input type="number" value="" class="total" readonly></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="tax-options">
+            <label><input type="radio" name="tax" value="taxExcluded" checked onclick="updateAll()"> 税抜</label>
+            <label><input type="radio" name="tax" value="taxIncluded" onclick="updateAll()"> 税込</label>
+        </div>
+
+        <div class="buttons">
+            <button type="reset" class="reset-btn">元に戻す</button>
+            <button type="submit" class="submit-btn">保存</button>
+        </div>
+
+        <button onclick="location.href='orderOption.html'" class="submit-btn">
+            注文オプション画面へ
+        </button>
+    </div>
+
+    <script>
+        const taxRate = 0.1;
+        
+        function updateRow(input) {
+            const row = input.closest('.item-row');
+            const qty = parseFloat(row.querySelector('.qty').value) || 0;
+            const price = parseFloat(row.querySelector('.price').value) || 0;
+            const taxOption = document.querySelector('input[name="tax"]:checked').value;
+
+            let total = qty * price;
+            if (taxOption === 'taxIncluded') {
+                total *= (1 + taxRate);
+            }
+
+            row.querySelector('.total').value = total.toFixed(0);
+        }
+
+        function updateAll() {
+            document.querySelectorAll('.item-row').forEach(row => {
+                updateRow(row.querySelector('.qty'));
+            });
+        }
+    </script>
+</body>
+
+</html>

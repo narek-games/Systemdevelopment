@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>注文書選択</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: white;
+      color: black;
+      padding: 20px;
+    }
+    h1 {
+      font-size: 24px;
+    }
+    .search-box {
+      border: 1px solid #ccc;
+      padding: 15px;
+      margin-bottom: 20px;
+      display: inline-block;
+    }
+    .search-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .search-box label {
+      margin-right: 5px;
+    }
+    .search-box input {
+      margin-right: 15px;
+      padding: 5px;
+    }
+    .search-btn {
+      padding: 5px 10px;
+      background-color: #e0e6f8;
+      border: 1px solid #888;
+      cursor: pointer;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-bottom: 30px;
+    }
+    th, td {
+      border: 1px solid #aaa;
+      padding: 8px;
+      text-align: center;
+    }
+    .status-pending {
+      color: red;
+    }
+    .btn {
+      padding: 10px 30px;
+      font-size: 16px;
+      margin-right: 20px;
+      border: 1px solid #aaa;
+      background-color: #dde6f3;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>注文書選択</h1>
+  <div class="search-box">
+    <div class="search-row">
+      <label for="order-id">注文ID</label>
+      <input type="text" id="order-id" value="">
+      <label for="order-date">注文日</label>
+      <input type="text" id="order-date" value="">
+    </div>
+    <div class="search-row">
+      <label for="customer-id">顧客ID</label>
+      <input type="text" id="customer-id" value="">
+      <label for="customer-name">顧客名</label>
+      <input type="text" id="customer-name" value="">
+      <button class="search-btn">検索</button>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>注文ID</th>
+        <th>顧客ID</th>
+        <th>顧客名</th>
+        <th>注文日</th>
+        <th>状態</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td colspan="5" style="height: 30px;"></td></tr>
+      <tr><td colspan="5" style="height: 30px;"></td></tr>
+      <tr><td colspan="5" style="height: 30px;"></td></tr>
+      <tr><td colspan="5" style="height: 30px;"></td></tr>
+    </tbody>
+  </table>
+
+ <button class="btn" onclick="location.href='deliveryHome.html'">戻る</button>
+  <button class="btn">作成</button>
+
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>注文書作成画面</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 10px;
+    }
+    th, td {
+      border: 1px solid #000;
+      padding: 8px;
+      text-align: center;
+    }
+    .label {
+      margin-top: 20px;
+    }
+    .button-container {
+      margin-top: 20px;
+    }
+    button {
+      width: 150px;
+      height: 40px;
+      font-size: 18px;
+      margin-right: 20px;
+      background-color: #007BFF; /* 青色 */
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3; /* 濃い青（ホバー時） */
+    }
+    .add-row {
+      font-size: 24px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>注文書作成画面</h2>
+
+  <div>
+  <label>顧客ID <input type="text" value="CU000001"></label>
+  <label>顧客名 <input type="text" value="大阪情報専門学校"></label>
+</div>
+
+
+  <table>
+    <thead>
+      <tr>
+        <th>品名</th>
+        <th>数量</th>
+        <th>単価</th>
+        <th>摘要</th>
+      </tr>
+    </thead>
+<tbody>
+  <tr>
+    <td contenteditable="true">週刊BCN vol.1942</td>
+    <td contenteditable="true">1</td>
+    <td contenteditable="true">363</td>
+    <td contenteditable="true"></td>
+  </tr>
+  <tr>
+    <td contenteditable="true">日経コンピュータ 11月号</td>
+    <td contenteditable="true">1</td>
+    <td contenteditable="true">1300</td>
+    <td contenteditable="true"></td>
+  </tr>
+  <tr>
+    <td contenteditable="true">日経ネットワーク 11月号</td>
+    <td contenteditable="true">1</td>
+    <td contenteditable="true">1300</td>
+    <td contenteditable="true"></td>
+  </tr>
+  <tr>
+    <td contenteditable="true">SoftwareDesign 11月号</td>
+    <td contenteditable="true">1</td>
+    <td contenteditable="true">1342</td>
+    <td contenteditable="true"></td>
+  </tr>
+  <tr>
+    <td contenteditable="true">医学書院 第7版 医学・医療編</td>
+    <td contenteditable="true">11</td>
+    <td contenteditable="true">3740</td>
+    <td contenteditable="true">978-4867058138</td>
+  </tr>
+  <tr>
+    <td contenteditable="true"></td>
+    <td contenteditable="true"></td>
+    <td contenteditable="true"></td>
+    <td contenteditable="true"></td>
+  </tr>
+  <tr>
+    <td contenteditable="true"></td>
+    <td contenteditable="true"></td>
+    <td contenteditable="true"></td>
+    <td contenteditable="true"></td>
+  </tr>
+</tbody>
+
+  </table>
+
+  <div class="add-row">＋</div>
+
+  <div class="button-container">
+  <a href="./orderHome.html"><button class="back-button">戻る</button></a>
+  <button onclick="submitForm()">作成</button>
+  </div>
+
+  <script>
+    
+  </script>
+
+</body>
+</html>

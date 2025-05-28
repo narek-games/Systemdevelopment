@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>納品書編集画面</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 20px;
+    }
+    h1 {
+      font-size: 20px;
+    }
+    .readonly-field {
+      margin-bottom: 10px;
+    }
+    .readonly-label {
+      font-weight: bold;
+    }
+    .readonly-value {
+      display: inline-block;
+      padding: 4px 8px;
+      background-color: #f0f0f0;
+      border: 1px solid #ccc;
+      width: 300px;
+    }
+    input[type="text"] {
+      width: 300px;
+      margin-bottom: 10px;
+    }
+    table {
+      border-collapse: collapse;
+      margin-top: 20px;
+      width: 100%;
+    }
+    table, th, td {
+      border: 1px solid black;
+    }
+    th, td {
+      padding: 5px;
+      text-align: center;
+    }
+    .button-group {
+      margin-top: 20px;
+    }
+    button {
+      font-size: 16px;
+      padding: 10px 20px;
+      margin-right: 10px;
+    }
+    .back-button {
+      background-color: #cddffb;
+    }
+    .delete-button {
+      background-color: #ff9999;
+    }
+    .save-button {
+      background-color: #cddffb;
+    }
+    .add-product {
+      margin-top: 10px;
+    }
+    a {
+      color: blue;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>納品書編集画面</h1>
+
+  <div class="readonly-field">
+    <span class="readonly-label">納品ID</span>：
+    <span class="readonly-value">DE000001</span>
+  </div>
+  <div class="readonly-field">
+    <label>日付 <input type="text" value="2022年10月16日"></label>
+  </div>
+  <div class="readonly-field">
+    <span class="readonly-label">顧客ID</span>：
+    <span class="readonly-value">CU000001</span>
+  </div>
+  <div class="readonly-field">
+    <span class="readonly-label">顧客名</span>：
+    <span class="readonly-value">大阪医療専門学校</span>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>品名</th>
+        <th>数量</th>
+        <th>未納品数量</th>
+        <th>単価</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a href="#">週刊BCN 10/17</a></td>
+        <td>1</td>
+        <td>1</td>
+        <td>363</td>
+      </tr>
+      <tr>
+        <td><a href="#">日経コンピュータ 11月号</a></td>
+        <td>1</td>
+        <td>1</td>
+        <td>1,300</td>
+      </tr>
+      <tr>
+        <td><a href="#">SoftwareDesign 11月号</a></td>
+        <td>1</td>
+        <td>1</td>
+        <td>1,342</td>
+      </tr>
+      <tr>
+        <td><a href="#">医療情報 第7版 医学・医療編</a></td>
+        <td>11</td>
+        <td>11</td>
+        <td>3,740</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="add-product">
+    <button>商品を追加</button>
+  </div>
+
+  <div class="button-group">
+    <a href="./deliveryHome.html"><button class="back-button">戻る</button></a>
+    <button class="delete-button">削除</button>
+    <button class="save-button">保存</button>
+  </div>
+
+</body>
+</html>

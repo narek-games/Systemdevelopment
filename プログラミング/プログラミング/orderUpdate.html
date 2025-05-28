@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>注文書編集画面</title>
+<style>
+  table, th, td {
+    border: 1px solid #333;
+    border-collapse: collapse;
+  }
+  th, td {
+    padding: 5px 10px;
+    text-align: center;
+  }
+  .btn {
+    width: 100px;
+    height: 40px;
+    font-size: 18px;
+    margin: 10px;
+  }
+  .status-red {
+     color: red;
+  }
+  .status-green {
+    color: green;
+  }
+</style>
+</head>
+<body>
+  <body style="display: flex; flex-direction: column; align-items: center; margin: 20px;">
+
+  <h2>注文書編集画面</h2>
+  <p>
+    注文ID: <input type="text" value="OR000001" readonly>
+    作成日: <input type="text" value="2022年10月16日12時00分00秒" readonly>
+    状態:
+    <input type="radio" name="status" checked>未納品
+    <input type="radio" name="status">納品済
+  </p>
+
+  <p>
+    顧客ID: <input type="text" value="CU000001" readonly>
+    顧客名: <input type="text" value="大阪情報専門学校"readonly>
+    納品日: <input type="text" value="2022年10月17日12時00分00秒"readonly>
+  </p>
+
+<div style="width: fit-content; margin: 30px auto; position: relative; text-align: center;">
+  <table>
+    <thead>
+      <tr>
+        <th></th>
+        <th>品名</th>
+        <th>注文数量</th>
+        <th>未納数量</th>
+        <th>単価</th>
+        <th>摘要</th>
+        <th>状態</th>
+      </tr>
+    </thead>
+    <tbody>
+    </tbody>
+  </table>
+
+  <button
+    style="
+      position: absolute;
+      bottom: -40px;
+      left: 0;
+      width: 70px;
+      height: 30px;
+      font-size: 14px;
+      background-color: red;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;"
+    onclick="deleteCheckedRows()">削除</button>
+
+  <button
+    style="
+      position: absolute;
+      right: 0;
+      bottom: -40px;
+      width: 30px;
+      height: 30px;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 5px;
+      border: none;
+      cursor: pointer;"
+    onclick="addRow()">+</button>
+</div>
+
+  <button class="btn" onclick="location.href='orderHome.html'">戻る</button>
+  <button class="btn">保存</button>
+<script>
+  function addRow() {
+    const table = document.querySelector("table tbody");
+    const newRow = document.createElement("tr");
+    newRow.innerHTML = `
+      <td><input type="checkbox"></td>
+      <td><input type="text" value="" ></td>
+      <td><input type="number" value="" ></td>
+      <td><input type="number" value="" ></td>
+      <td><input type="number" value="" ></td>
+      <td><input type="text" value="" ></td>
+      <td class="status-red"></td>
+    `;
+    table.appendChild(newRow);
+  }
+  function deleteCheckedRows() {
+    if (!confirm("選択した行を削除してもよろしいですか？")) {
+      return; // キャンセルされたら中断
+    }
+
+    const table = document.querySelector("table tbody");
+    const rows = table.querySelectorAll("tr");
+    rows.forEach(row => {
+      const checkbox = row.querySelector("input[type='checkbox']");
+      if (checkbox && checkbox.checked) {
+        table.removeChild(row);
+      }
+    });
+  }
+</script>
+</body>
+</html>

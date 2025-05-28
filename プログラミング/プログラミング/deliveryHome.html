@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>納品書管理画面</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+    }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-bottom: 20px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: center;
+    }
+    th {
+      background-color: #f4f4f4;
+    }
+    .btn {
+      padding: 10px 30px;
+      font-size: 16px;
+      margin: 10px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .btn-back, .btn-new {
+      background-color: #dbe7f9;
+    }
+    .edit a, .delete, .print a {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 14px;
+      text-decoration: none;
+    }
+    .edit a {
+      color: blue;
+    }
+    .delete {
+      color: red;
+    }
+    .print a {
+      color: orange;
+    }
+    .note {
+      font-size: 12px;
+      color: gray;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>納品書管理画面</h1>
+
+  <table>
+    <tr>
+      <th>納品ID</th>
+      <th>顧客ID</th>
+      <th>更新日</th>
+      <th>顧客名</th>
+      <th>編集</th>
+      <th>削除</th>
+      <th>印刷</th>
+    </tr>
+    <tr>
+      <td>DE000001</td>
+      <td>CU000001</td>
+      <td>2022年10月17日</td>
+      <td>大阪情報専門学校</td>
+      <td class="edit"><a href="./deliveryUpdate.html">編集</a></td>
+      <td class="delete">削除</td>
+      <td class="print"><a href="./deliveryPrint.html">印刷</a></td>
+    </tr>
+    <!-- 他の行がここに続く -->
+  </table>
+
+  <a href="./home.html"><button class="btn btn-back">戻る</button></a>
+  <a href="./orderOption.html"><button class="btn btn-new">新規納品書作成</button></a>
+
+</body>
+</html>

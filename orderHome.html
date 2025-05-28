@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>注文書管理画面</title>
+  <link rel="stylesheet" href="orderHome_styles.css">
+</head>
+<body>
+  <h1>注文書管理画面</h1>
+
+  <div class="search-container">
+    <input type="text" placeholder="顧客名または注文ID">
+    <button>🔍</button>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>注文ID</th>
+        <th>顧客名</th>
+        <th>作成日</th>
+        <th>状態</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>OR000001</td>
+        <td>大阪情報専門学校</td>
+        <td>2022年10月16日</td>
+        <td><span class="status pending">未納品</span></td>
+        <td>
+          <a href="#" class="edit">編集</a>
+          <a href="#" class="delete">削除</a>
+        </td>
+      </tr>
+      <tr>
+        <td>OR000002</td>
+        <td>東京ITカレッジ</td>
+        <td>2022年10月17日</td>
+        <td><span class="status done">納品済</span></td>
+        <td>
+          <span class="disabled">編集</span>
+          <span class="disabled">削除</span>
+        </td>
+      </tr>
+      <tr>
+        <td>OR000003</td>
+        <td>名古屋ソフト学院</td>
+        <td>2022年10月18日</td>
+        <td><span class="status pending">未納品</span></td>
+        <td>
+          <a href="#" class="edit">編集</a>
+          <a href="#" class="delete">削除</a>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="button-group">
+    <button class="back" onclick="location.href='home.html'">戻る</button>
+    <button class="create" onclick="location.href='orderInsert.html'">新規注文書作成</button>
+  </div>
+</body>
+</html>

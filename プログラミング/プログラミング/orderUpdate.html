@@ -6,14 +6,6 @@
 </head>
 <title>注文書編集画面</title>
 <style>
-  body {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    min-height: 100vh;
-    margin: 0;
-  }
   table, th, td {
     border: 1px solid #333;
     border-collapse: collapse;
@@ -23,26 +15,28 @@
     text-align: center;
   }
   .btn {
-    width: 170px;
-    height: 40px;
-    font-size: 18px;
-    margin: 10px;
-  }
+  width: 170px;
+  height: 40px;
+  font-size: 18px;
+  margin: 10px;
+  background-color: #3399ff; /* やや明るめの青 */
+  color: white;              /* 文字は白に */
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
   .status-red {
      color: red;
   }
   .status-green {
     color: green;
   }
-  .centered {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin: 20px;
-  }
 </style>
 </head>
 <body>
+  <!--画面中央に寄せる-->
+  <body style="display: flex; flex-direction: column; align-items: center; margin: 20px;">
+
   <h2>注文書編集画面</h2>
   <!--DBから読み取れるようにする-->
   <p>

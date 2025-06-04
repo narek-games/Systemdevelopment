@@ -3,8 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <title>MBSアプリ</title>
-
 <style>
+  body{
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    margin: 20px;
+  }
   table, th, td {
     border: 1px solid #333;
     border-collapse: collapse;
@@ -18,10 +23,38 @@
     height: 40px;
     font-size: 18px;
     margin: 10px;
-    background-color: #3399ff;
-    color: white;
+    background-color: #dbe7f9;
+    color: black;
     border: none;
     border-radius: 5px;
+    cursor: pointer;
+  }
+  .btn:hover{
+    background-color: #4d7bc1;
+  }
+  .btn-delete{
+    position: absolute;
+    bottom: -40px;
+    left: 0;
+    width: 70px;
+    height: 30px;
+    font-size: 14px;
+    background-color: red;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .btn-addRow{
+    position: absolute;
+    right: 0;
+    bottom: -40px;
+    width: 30px;
+    height: 30px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 5px;
+    border: none;
     cursor: pointer;
   }
   .status-red {
@@ -33,10 +66,9 @@
 </style>
 </head>
 
-<body style="display: flex; flex-direction: column; align-items: center; margin: 20px;">
-
+<body>
 <h2>注文書編集画面</h2>
-
+<!--DBの連携 (最後にやる)-->
 <p>
   注文ID: <input type="text" value="OR000001" readonly>
   作成日: <input type="text" value="2022年10月16日12時00分00秒" readonly>
@@ -44,12 +76,12 @@
   <input type="radio" name="status" checked>未納品
   <input type="radio" name="status">納品済
 </p>
-
 <p>
   顧客ID: <input type="text" value="CU000001" readonly>
   顧客名: <input type="text" value="大阪情報専門学校" readonly>
   納品日: <input type="text" value="2022年10月17日12時00分00秒" readonly>
 </p>
+<!--ここまで-->
 
 <div style="width: fit-content; margin: 30px auto; position: relative; text-align: center;">
   <table>
@@ -69,42 +101,15 @@
     </tbody>
   </table>
 
-  <button
-    style="
-      position: absolute;
-      bottom: -40px;
-      left: 0;
-      width: 70px;
-      height: 30px;
-      font-size: 14px;
-      background-color: red;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;"
-    onclick="deleteCheckedRows()">削除</button>
-
-  <button
-    style="
-      position: absolute;
-      right: 0;
-      bottom: -40px;
-      width: 30px;
-      height: 30px;
-      font-size: 16px;
-      font-weight: bold;
-      border-radius: 5px;
-      border: none;
-      cursor: pointer;"
-    onclick="addRow()">+</button>
+  <button class="btn-delete" onclick="deleteCheckedRows()">削除</button>
+  <button class="btn-addRow" onclick="addRow()">+</button>
 </div>
-
 <p>
   <button class="btn" onclick="location.href='orderHome.html'">戻る</button>
   <button class="btn" onclick="saveTableState()">保存</button>
 </p>
-
 <script>
+  //入力が空かどうかをチェック　商品欄等が未入力の場合納品状態の欄が入力されないようにする
   function updateStatusOnInput(event) {
     const row = event.target.closest("tr");
     const name = row.querySelectorAll("td")[1].querySelector("input").value.trim();
@@ -112,16 +117,17 @@
     const remainQtyInput = row.querySelectorAll("td")[3].querySelector("input");
     const remainQty = parseInt(remainQtyInput.value);
     const statusCell = row.querySelectorAll("td")[6];
-
+    //情報がすべて空 ➡ 納品状態も空欄
     if (!name && !orderQty && !remainQtyInput.value) {
       statusCell.textContent = "";
       statusCell.className = "";
       return;
     }
-
+    //0の場合 ➡ 納品済　
+    //それ以外 ➡ 未納品　
     if (!isNaN(remainQty)) {
       if (remainQty === 0) {
-        statusCell.textContent = "納品済み";
+        statusCell.textContent = "納品済";
         statusCell.className = "status-green";
       } else {
         statusCell.textContent = "未納品";
@@ -138,9 +144,9 @@
       !data.name && !data.orderQty && !data.remainQty;
 
     const statusText = isEmpty ? "" :
-      (parseInt(data.remainQty) === 0 ? "納品済み" : "未納品");
+      (parseInt(data.remainQty) === 0 ? "納品済" : "未納品");
 
-    const statusClass = statusText === "納品済み" ? "status-green" :
+    const statusClass = statusText === "納品済" ? "status-green" :
       statusText === "未納品" ? "status-red" : "";
 
     newRow.innerHTML = `
@@ -186,7 +192,7 @@
       // 空の行は保存しない
       if (!name && !orderQty && !remainQty) return;
 
-      const status = parseInt(remainQty) === 0 ? "納品済み" : "未納品";
+      const status = parseInt(remainQty) === 0 ? "納品済" : "未納品";
 
       const rowData = {
         checked: cells[0].querySelector("input[type='checkbox']").checked,

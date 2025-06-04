@@ -14,18 +14,18 @@
     text-align: center;
   }
   .btn {
-  width: 170px;
-  height: 40px;
-  font-size: 18px;
-  margin: 10px;
-  background-color: #3399ff; /* やや明るめの青 */
-  color: white;              /* 文字は白に */
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
+    width: 170px;
+    height: 40px;
+    font-size: 18px;
+    margin: 10px;
+    background-color: #3399ff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
   .status-red {
-     color: red;
+    color: red;
   }
   .status-green {
     color: green;
@@ -33,24 +33,23 @@
 </style>
 </head>
 
-  <!--画面中央に寄せる-->
-  <body style="display: flex; flex-direction: column; align-items: center; margin: 20px;">
+<body style="display: flex; flex-direction: column; align-items: center; margin: 20px;">
 
-  <h2>注文書編集画面</h2>
-  <!--DBから読み取れるようにする-->
-  <p>
-    注文ID: <input type="text" value="OR000001" readonly>
-    作成日: <input type="text" value="2022年10月16日12時00分00秒" readonly>
-    状態:
-    <input type="radio" name="status" checked>未納品
-    <input type="radio" name="status">納品済
-  </p>
+<h2>注文書編集画面</h2>
 
-  <p>
-    顧客ID: <input type="text" value="CU000001" readonly>
-    顧客名: <input type="text" value="大阪情報専門学校"readonly>
-    納品日: <input type="text" value="2022年10月17日12時00分00秒"readonly>
-  </p>
+<p>
+  注文ID: <input type="text" value="OR000001" readonly>
+  作成日: <input type="text" value="2022年10月16日12時00分00秒" readonly>
+  状態:
+  <input type="radio" name="status" checked>未納品
+  <input type="radio" name="status">納品済
+</p>
+
+<p>
+  顧客ID: <input type="text" value="CU000001" readonly>
+  顧客名: <input type="text" value="大阪情報専門学校" readonly>
+  納品日: <input type="text" value="2022年10月17日12時00分00秒" readonly>
+</p>
 
 <div style="width: fit-content; margin: 30px auto; position: relative; text-align: center;">
   <table>
@@ -66,7 +65,7 @@
       </tr>
     </thead>
     <tbody>
-      <!--DB連携できた後に書く-->
+      <!-- 行はスクリプトで追加 -->
     </tbody>
   </table>
 
@@ -106,93 +105,119 @@
 </p>
 
 <script>
-    function updateStatusOnInput(event) {
-      const row = event.target.closest("tr");
-      const remainQty = parseInt(row.querySelectorAll("td")[3].querySelector("input").value);
-      const statusCell = row.querySelectorAll("td")[6];
-      if (!isNaN(remainQty)) {
-        if (remainQty === 0) {
-          statusCell.textContent = "納品済み";
-          statusCell.className = "status-green";
-        } else {
-          statusCell.textContent = "未納品";
-          statusCell.className = "status-red";
-        }
+  function updateStatusOnInput(event) {
+    const row = event.target.closest("tr");
+    const name = row.querySelectorAll("td")[1].querySelector("input").value.trim();
+    const orderQty = row.querySelectorAll("td")[2].querySelector("input").value.trim();
+    const remainQtyInput = row.querySelectorAll("td")[3].querySelector("input");
+    const remainQty = parseInt(remainQtyInput.value);
+    const statusCell = row.querySelectorAll("td")[6];
+
+    if (!name && !orderQty && !remainQtyInput.value) {
+      statusCell.textContent = "";
+      statusCell.className = "";
+      return;
+    }
+
+    if (!isNaN(remainQty)) {
+      if (remainQty === 0) {
+        statusCell.textContent = "納品済み";
+        statusCell.className = "status-green";
+      } else {
+        statusCell.textContent = "未納品";
+        statusCell.className = "status-red";
       }
     }
+  }
 
-    function addRow(data = {}) {
-      const table = document.querySelector("table tbody");
-      const newRow = document.createElement("tr");
+  function addRow(data = {}) {
+    const table = document.querySelector("table tbody");
+    const newRow = document.createElement("tr");
 
-      newRow.innerHTML = `
-        <td><input type="checkbox" ${data.checked ? "checked" : ""}></td>
-        <td><input type="text" value="${data.name || ""}"></td>
-        <td><input type="number" min="0" value="${data.orderQty || ""}"></td>
-        <td><input type="number" min="0" value="${data.remainQty || ""}"></td>
-        <td><input type="number" min="0" value="${data.price || ""}"></td>
-        <td><input type="text" value="${data.note || ""}"></td>
-        <td class="${data.status === '納品済み' ? 'status-green' : 'status-red'}">${data.status || ""}</td>
-      `;
+    const isEmpty =
+      !data.name && !data.orderQty && !data.remainQty;
 
-      const remainQtyInput = newRow.querySelectorAll("td")[3].querySelector("input");
-      remainQtyInput.addEventListener("input", updateStatusOnInput);
+    const statusText = isEmpty ? "" :
+      (parseInt(data.remainQty) === 0 ? "納品済み" : "未納品");
 
-      table.appendChild(newRow);
-    }
+    const statusClass = statusText === "納品済み" ? "status-green" :
+      statusText === "未納品" ? "status-red" : "";
 
-    function deleteCheckedRows() {
-      if (!confirm("選択した行を削除してもよろしいですか？")) return;
+    newRow.innerHTML = `
+      <td><input type="checkbox" ${data.checked ? "checked" : ""}></td>
+      <td><input type="text" value="${data.name || ""}"></td>
+      <td><input type="number" min="0" value="${data.orderQty || ""}"></td>
+      <td><input type="number" min="0" value="${data.remainQty || ""}"></td>
+      <td><input type="number" min="0" value="${data.price || ""}"></td>
+      <td><input type="text" value="${data.note || ""}"></td>
+      <td class="${statusClass}">${statusText}</td>
+    `;
 
-      const table = document.querySelector("table tbody");
-      const rows = table.querySelectorAll("tr");
-      rows.forEach(row => {
-        const checkbox = row.querySelector("input[type='checkbox']");
-        if (checkbox && checkbox.checked) {
-          table.removeChild(row);
-        }
-      });
-    }
+    const remainQtyInput = newRow.querySelectorAll("td")[3].querySelector("input");
+    remainQtyInput.addEventListener("input", updateStatusOnInput);
 
-    function saveTableState() {
-      const table = document.querySelector("table tbody");
-      const rows = table.querySelectorAll("tr");
-      const tableData = [];
+    table.appendChild(newRow);
+  }
 
-      rows.forEach(row => {
-        const cells = row.querySelectorAll("td");
-        const remainQty = parseInt(cells[3].querySelector("input").value);
-        const status = remainQty === 0 ? "納品済み" : "未納品";
+  function deleteCheckedRows() {
+    if (!confirm("選択した行を削除してもよろしいですか？")) return;
 
-        const rowData = {
-          checked: cells[0].querySelector("input[type='checkbox']").checked,
-          name: cells[1].querySelector("input").value,
-          orderQty: cells[2].querySelector("input").value,
-          remainQty: cells[3].querySelector("input").value,
-          price: cells[4].querySelector("input").value,
-          note: cells[5].querySelector("input").value,
-          status: status
-        };
-        tableData.push(rowData);
-      });
+    const table = document.querySelector("table tbody");
+    const rows = table.querySelectorAll("tr");
+    rows.forEach(row => {
+      const checkbox = row.querySelector("input[type='checkbox']");
+      if (checkbox && checkbox.checked) {
+        table.removeChild(row);
+      }
+    });
+  }
 
-      localStorage.setItem("orderTableData", JSON.stringify(tableData));
-      alert("保存しました！");
-    }
+  function saveTableState() {
+    const table = document.querySelector("table tbody");
+    const rows = table.querySelectorAll("tr");
+    const tableData = [];
 
-    function loadTableState() {
-      const tableData = JSON.parse(localStorage.getItem("orderTableData"));
-      if (!tableData) return;
+    rows.forEach(row => {
+      const cells = row.querySelectorAll("td");
+      const name = cells[1].querySelector("input").value.trim();
+      const orderQty = cells[2].querySelector("input").value.trim();
+      const remainQty = cells[3].querySelector("input").value.trim();
 
-      const table = document.querySelector("table tbody");
-      table.innerHTML = "";
+      // 空の行は保存しない
+      if (!name && !orderQty && !remainQty) return;
 
-      tableData.forEach(rowData => {
-        addRow(rowData);
-      });
-    }
+      const status = parseInt(remainQty) === 0 ? "納品済み" : "未納品";
 
-    window.onload = loadTableState;
-  </script>
+      const rowData = {
+        checked: cells[0].querySelector("input[type='checkbox']").checked,
+        name: name,
+        orderQty: orderQty,
+        remainQty: remainQty,
+        price: cells[4].querySelector("input").value,
+        note: cells[5].querySelector("input").value,
+        status: status
+      };
+      tableData.push(rowData);
+    });
+
+    localStorage.setItem("orderTableData", JSON.stringify(tableData));
+    alert("保存しました！");
+  }
+
+  function loadTableState() {
+    const tableData = JSON.parse(localStorage.getItem("orderTableData"));
+    if (!tableData) return;
+
+    const table = document.querySelector("table tbody");
+    table.innerHTML = "";
+
+    tableData.forEach(rowData => {
+      addRow(rowData);
+    });
+  }
+
+  window.onload = loadTableState;
+</script>
+
 </body>
 </html>

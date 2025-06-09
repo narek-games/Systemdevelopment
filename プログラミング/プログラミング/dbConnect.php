@@ -4,7 +4,7 @@
     $port = 3306;
     $dbname = 'mbs';
     $username = 'root';
-    $password = '';
+    $password = '1212';
     $charset = 'utf8mb4';
 
     $dsn = "mysql:host=$host;port=$port;dbname=$dbname;charset=$charset";

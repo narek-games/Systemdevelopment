@@ -98,20 +98,27 @@ $stmt = $pdo->query($sql);
 
         .btn-container {
             margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 40px;
         }
 
         .btn {
-            font-size: 18px;
-            padding: 10px 30px;
-            margin: 0 10px;
-            background-color: #d6e4ff;
-            border: 1px solid #aaa;
-            border-radius: 5px;
+            display: inline-block;
+            width: 250px;
+            padding: 15px;
+            font-size: 20px;
+            background-color: #c7dbf3;
+            border: 1px solid #888;
+            border-radius: 8px;
+            box-shadow: 2px 2px 3px #888;
+            color: black;
             cursor: pointer;
+            margin: 0;
         }
 
         .btn:hover {
-            background-color: #aacbff;
+            background-color: #a5c6ed;
         }
 
         .search-button {
@@ -157,28 +164,34 @@ $stmt = $pdo->query($sql);
                 <th></th>
                 <th></th>
             </tr>
-            <?php while ($row = $stmt->fetch(PDO::FETCH_ASSOC)): ?>
+            <?php if ($stmt->rowCount() > 0): ?>
+                <?php while ($row = $stmt->fetch(PDO::FETCH_ASSOC)): ?>
+                    <tr>
+                        <td><?= htmlspecialchars($row['order_id']) ?></td>
+                        <td><?= htmlspecialchars($row['customer_name']) ?></td>
+                        <td><?= date('Y年m月d日', strtotime($row['order_date'])) ?></td>
+                        <td class="<?= $row['order_state'] ? 'status-complete' : 'status-pending' ?>">
+                            <?= $row['order_state'] ? '納品済' : '未納品' ?>
+                        </td>
+                        <td>
+                            <a class="edit-link <?= $row['order_state'] ? 'disabled' : '' ?>" href="orderUpdate.html">編集</a>
+                        </td>
+                        <td>
+                            <a class="delete-link <?= $row['order_state'] ? 'disabled' : '' ?>" href="orderDelete.php">削除</a>
+                        </td>
+                    </tr>
+                <?php endwhile; ?>
+                <!-- 空行を数行分追加 -->
+                <?php for ($i = 0; $i < 5; $i++): ?>
+                    <tr>
+                        <td colspan="6">&nbsp;</td>
+                    </tr>
+                <?php endfor; ?>
+            <?php else: ?>
                 <tr>
-                    <td><?= htmlspecialchars($row['order_id']) ?></td>
-                    <td><?= htmlspecialchars($row['customer_name']) ?></td>
-                    <td><?= date('Y年m月d日', strtotime($row['order_date'])) ?></td>
-                    <td class="<?= $row['order_state'] ? 'status-complete' : 'status-pending' ?>">
-                        <?= $row['order_state'] ? '納品済' : '未納品' ?>
-                    </td>
-                    <td>
-                        <a class="edit-link <?= $row['order_state'] ? 'disabled' : '' ?>" href="orderUpdate.html">編集</a>
-                    </td>
-                    <td>
-                        <a class="delete-link <?= $row['order_state'] ? 'disabled' : '' ?>" href="orderDelete.php">削除</a>
-                    </td>
+                    <td colspan="6">注文データが存在しません。</td>
                 </tr>
-            <?php endwhile; ?>
-            <!-- 空行を数行分追加 -->
-            <?php for ($i = 0; $i < 5; $i++): ?>
-                <tr>
-                    <td colspan="6">&nbsp;</td>
-                </tr>
-            <?php endfor; ?>
+            <?php endif; ?>
         </table>
     </div>
 

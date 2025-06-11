@@ -1,5 +1,5 @@
 <?php
-require_once 'dbConnect.php'; // DB接続を行うファイルを呼び出す
+require_once 'dbConnectFunction.php';  // DB接続を行うファイルを呼び出す
 
 $sql = "
     ここにSQL文を書く

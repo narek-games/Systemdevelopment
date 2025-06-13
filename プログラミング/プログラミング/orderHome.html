@@ -1,61 +1,172 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="utf-8">
-        <title>MBSアプリ</title>
-    </head>
-    <body>
-        <div>
-            <input type="text">
-            <input type="button" value="検索">
-        </div>
-        <div>
-            <table>
-                <tr>
-                    <th>注文ID</th>
-                    <th>顧客名</th>
-                    <th>作成日</th>
-                    <th>状態</th>
-                    <th></th>
-                    <th></th>
-                </tr>
-                <tr>
-                    <td>OR000001</td>
-                    <td>大阪情報専門学校</td>
-                    <td>2022年10月16日</td>
-                    <td>未納品</td>
-                    <td>編集</td>
-                    <td>削除</td>
-                </tr>
-                <tr>
-                    <td>OR000002</td>
-                    <td>東京ITカレッジ</td>
-                    <td>2022年10月17日</td>
-                    <td>納品済</td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>OR000003</td>
-                    <td>名古屋ソフト学院</td>
-                    <td>2022年10月18日</td>
-                    <td>未納品</td>
-                    <td>編集</td>
-                    <td>削除</td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-            </table>
-        </div>
-        <div>
-            <a href="./home.html"><input type="button" value="戻る"></a>
-            <a href="./orderInsert.html"><input type="button" value="新規注文書作成"></a>
-        </div>
-    </body>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <title>注文書管理画面</title>
+  <style>
+    body {
+      font-family: "Hiragino Kaku Gothic ProN", sans-serif;
+      background: #f4f4f4;
+      background-color: white;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .search-container {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .search-container input[type="text"] {
+      padding: 8px;
+      width: 300px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+
+    .search-container button {
+      padding: 8px 12px;
+      font-size: 16px;
+      background-color: cornflowerblue;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .search-container button:hover {
+      background-color: #bcd4f7;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+
+    table th,
+    table td {
+      border: 1px solid #999;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .status {
+      font-weight: bold;
+      padding: 4px 8px;
+      border-radius: 4px;
+      display: inline-block;
+    }
+
+    .status.pending {
+      background-color: orange;
+      color: white;
+    }
+
+    .status.done {
+      background-color: green;
+      color: white;
+    }
+
+    a.edit,
+    a.delete {
+      margin: 0 5px;
+      color: blue;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    .disabled {
+      color: gray;
+      margin: 0 5px;
+    }
+
+    .button-group {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+    }
+
+    .back,
+    .create {
+      width: 200px;
+      padding: 12px;
+      font-size: 16px;
+      background-color: cornflowerblue;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .back:hover,
+    .create:hover {
+      background-color: blue;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>注文書管理画面</h1>
+
+  <div class="search-container">
+    <input type="text" placeholder="顧客名または注文ID">
+    <button>🔍</button>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>注文ID</th>
+        <th>顧客名</th>
+        <th>作成日</th>
+        <th>状態</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>OR000001</td>
+        <td>大阪情報専門学校</td>
+        <td>2022年10月16日</td>
+        <td><span class="status pending">未納品</span></td>
+        <td>
+          <a href="#" class="edit">編集</a>
+          <a href="#" class="delete">削除</a>
+        </td>
+      </tr>
+      <tr>
+        <td>OR000002</td>
+        <td>東京ITカレッジ</td>
+        <td>2022年10月17日</td>
+        <td><span class="status done">納品済</span></td>
+        <td>
+          <span class="disabled">編集</span>
+          <span class="disabled">削除</span>
+        </td>
+      </tr>
+      <tr>
+        <td>OR000003</td>
+        <td>名古屋ソフト学院</td>
+        <td>2022年10月18日</td>
+        <td><span class="status pending">未納品</span></td>
+        <td>
+          <a href="#" class="edit">編集</a>
+          <a href="#" class="delete">削除</a>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="button-group">
+    <button class="back" onclick="location.href='home.html'">戻る</button>
+    <button class="create" onclick="location.href='orderInsert.html'">新規注文書作成</button>
+  </div>
+</body>
+
 </html>

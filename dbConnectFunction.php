@@ -29,7 +29,7 @@ try {
         echo "<tr>
             <td>{$row['customer_id']}</td>
             <td>{$row['customer_name']}</td>
-            <td>{$row['contact_person']}</td>
+            <td>{$row['customer_person']}</td>
             <td>{$row['address']}</td>
             <td>{$row['phone_number']}</td>
             <td>{$row['customer_notes']}</td>

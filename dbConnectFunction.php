@@ -24,7 +24,7 @@ try {
     echo "<h2>顧客リスト</h2>";
     $stmt = $pdo->query("SELECT * FROM customer");
     echo "<table border='1'>
-        <tr><th>ID</th><th>顧客名</th><th>担当者</th><th>住所</th><th>電話番号</th><th>備考</th><th>登録日</th><th>累計売上</th><th>リードタイム</th><th>納品回数</th></tr>";
+        <tr><th>顧客ID</th><th>顧客名</th><th>担当者</th><th>住所</th><th>電話番号</th><th>備考</th><th>登録日</th><th>累計売上</th><th>リードタイム</th><th>納品回数</th></tr>";
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         echo "<tr>
             <td>{$row['customer_id']}</td>

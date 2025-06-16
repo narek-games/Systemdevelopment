@@ -1,166 +1,87 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html>
+
 <head>
-  <meta charset="UTF-8">
-  <title>納品書印刷画面</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      padding: 20px;
-      background-color: #fff;
-    }
+    <meta charset="utf-8">
+    <title>納品書印刷画面</title>
+    <style>
+        body {
+            font-family: "Hiragino Kaku Gothic ProN", sans-serif;
+            text-align: center;
+            padding: 30px;
+            background-color: white;
+        }
 
-    h1 {
-      font-size: 24px;
-      margin-bottom: 10px;
-    }
+        .upload-area {
+            border: 2px solid black;
+            padding: 50px;
+            margin: 20px auto;
+            width: 600px;
+            height: 200px;
+            position: relative;
+        }
 
-    .title {
-      color: #0072ce;
-      font-weight: bold;
-      font-size: 18px;
-      margin-top: 20px;
-    }
+        .upload-icon {
+            font-size: 60px;
+        }
 
-    .info-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin: 5px 0 10px 0;
-      font-size: 14px;
-    }
+        .upload-text {
+            margin-top: 10px;
+            color: #333;
+        }
 
-    .customer {
-      font-size: 20px;
-      font-weight: bold;
-      color: #0072ce;
-    }
+        .file-select {
+            margin-top: 20px;
+        }
 
-    .customer span {
-      margin-left: 10px;
-    }
+        .button-print,
+        .button-back {
+            width: 150px;
+            padding: 12px;
+            margin: 20px 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: cornflowerblue;
+            cursor: pointer;
 
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      margin-top: 10px;
-    }
+            /*box-shadow: 2px 2px 2px #999;*/
+        }
 
-    th, td {
-      border: 1px solid #0072ce;
-      padding: 6px;
-      text-align: center;
-      font-size: 14px;
-    }
+        .button-back {
+            background-color: whitesmoke;
+        }
+        .button-back:hover {
+            background-color: gray;
+        }
+        .button-print:hover {
+            background: blue;
+        }
 
-    .blue-text {
-      color: #0072ce;
-      font-weight: bold;
-    }
+        .button:active {
+            box-shadow: inset 2px 2px 5px #666;
+        }
 
-    .btn-area {
-      text-align: center;
-      margin-top: 20px;
-    }
-
-    .btn {
-      padding: 10px 30px;
-      font-size: 16px;
-      margin: 10px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    .btn-back {
-      background-color: #dbe7f9;
-    }
-
-    .btn-print {
-      background-color: #f58220;
-      color: white;
-    }
-
-    .total-bold {
-      font-weight: bold;
-      font-size: 16px;
-    }
-
-    .amount-final {
-      font-weight: bold;
-      font-size: 20px;
-      text-align: right;
-      padding-right: 10px;
-    }
-  </style>
+        .file-name {
+            padding: 10px;
+            width: 300px;
+            font-size: 16px;
+        }
+    </style>
 </head>
+
 <body>
+    <h1>納品書印刷画面</h1>
+    <p>ここに印刷プレビューを出す</p>
+    <div class="upload-area" id="drop-area">
+        <div class="upload-text">印刷プレビュー</div>
+    </div>
 
-  <h1>納品書印刷画面</h1>
-
-  <div class="title">納品書</div>
-
-  <div class="info-row">
-    <div class="customer">大阪情報専門学校<span>様</span></div>
-    <div>2022 年 10 月 17 日</div>
-  </div>
-
-  <div class="blue-text" style="font-size: 12px;">下記の通り納品いたしました</div>
-
-  <table>
-    <tr>
-      <th>品</th>
-      <th>名</th>
-      <th>数量</th>
-      <th>単価</th>
-      <th colspan="2">金額（税抜／税込）</th>
-    </tr>
-    <tr>
-      <td>1</td>
-      <td>日経コンピュータ　11月号</td>
-      <td>1</td>
-      <td>1300</td>
-      <td colspan="2">￥1300</td>
-    </tr>
-    <tr>
-      <td>2</td>
-      <td>日経ネットワーク　11月号</td>
-      <td>1</td>
-      <td>1300</td>
-      <td colspan="2">￥1300</td>
-    </tr>
-    <tr>
-      <td>3</td><td colspan="5">&nbsp;</td>
-    </tr>
-    <tr>
-      <td>4</td><td colspan="5">&nbsp;</td>
-    </tr>
-    <tr>
-      <td>5</td><td colspan="5">&nbsp;</td>
-    </tr>
-    <tr class="blue-text total-bold">
-      <td colspan="2">合　計</td>
-      <td>2</td>
-      <td></td>
-      <td colspan="2">￥2,600</td>
-    </tr>
-    <tr>
-      <td colspan="2">税率</td>
-      <td colspan="2">消費税</td>
-      <td colspan="2">税込合計金額</td>
-    </tr>
-    <tr>
-      <td colspan="2">10%</td>
-      <td colspan="2">-</td>
-      <td colspan="2" class="amount-final">￥2,600</td>
-    </tr>
-  </table>
-
-  <div class="btn-area">
-    <a href="./deliveryHome.html"><button class="btn btn-back">戻る</button></a>
-    <button class="btn btn-print" onclick="window.print()">印刷</button>
-  </div>
+    <div>
+        <a href="deliveryHome.html"><button class="button-back">戻る</button></a>
+        <a href="print.php"></a><button class="button-print">印刷</button>
+    </div>
 
 </body>
+
 </html>

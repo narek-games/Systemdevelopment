@@ -1,14 +1,105 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
   <meta charset="UTF-8">
   <title>顧客情報アップロード画面</title>
   <style>
+    html,
     body {
-      font-family: sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+
+
+    header h1 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+
+    header {
+      position: sticky;
+      top: 0;
+      color: white;
+      background-color: blue;
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+       border-radius: 16px;
+      
+    }
+
+    /* ハンバーガーアイコン */
+    .menu-icon {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+      padding: 5px;
+    }
+
+    .menu-icon div {
+      background-color: white;
+      height: 3px;
+      margin: 4px 0;
+      width: 25px;
+    }
+
+    /* ナビメニューの共通スタイル */
+    nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    nav a {
+      color: white;
+      padding: 8px 16px;
+      text-decoration: none;
+
+      border-radius: 5px;
+    }
+
+
+
+    /* モバイル用：非表示にして開閉式に */
+    @media (max-width: 768px) {
+      .menu-icon {
+        display: flex;
+      }
+
+      nav {
+        display: none;
+        flex-direction: column;
+        width: 100%;
+        background-color: blue;
+        padding: 10px 0;
+      }
+
+      nav.show-menu {
+        display: flex;
+      }
+    }
+
+    nav a:hover {
+      background-color:blue
+    }
+
+    .show-menu {
+      display: flex;
+    }
+
+    body {
+      font-family: "Hiragino Kaku Gothic ProN", sans-serif;
       text-align: center;
       padding: 30px;
+      background-color: white;
     }
+
     .upload-area {
       border: 2px solid black;
       padding: 50px;
@@ -17,56 +108,115 @@
       height: 200px;
       position: relative;
     }
+
     .upload-icon {
       font-size: 60px;
     }
+
     .upload-text {
       margin-top: 10px;
       color: #333;
     }
+
     .file-select {
       margin-top: 20px;
     }
-    .button {
-      padding: 10px 30px;
+
+    .button-upload {
+      background-color: cornflowerblue;
+      width: 150px;
+      padding: 12px;
       margin: 20px 10px;
-      font-size: 20px;
+      font-size: 16px;
+      border: 1px solid #ccc;
       border-radius: 8px;
-      border: none;
-      background-color: #cfe0ff;
       cursor: pointer;
-      box-shadow: 2px 2px 2px #999;
     }
+
+    .button-back {
+      width: 150px;
+      padding: 12px;
+      margin: 20px 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .button {
+      width: 150px;
+      padding: 12px;
+      margin: 20px 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background-color: cornflowerblue;
+      cursor: pointer;
+
+      /*box-shadow: 2px 2px 2px #999;*/
+    }
+    .button:hover {
+      background-color: blue
+    }
+    .button-back:hover {
+      background:gray;
+    }
+
+    .button-upload:hover {
+      background: blue;
+    }
+
     .button:active {
       box-shadow: inset 2px 2px 5px #666;
     }
+
+    
+
     .file-name {
       padding: 10px;
       width: 300px;
       font-size: 16px;
     }
+
   </style>
 </head>
+
 <body>
+  <header>
+    <h1>顧客情報アップロード画面</h1>
+    <div class="menu-icon" onclick="toggleMenu()">
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
 
-  <h1>顧客情報アップロード画面</h1>
 
-  <div class="upload-area" id="drop-area">
-    <div class="upload-icon">⬆</div>
-    <div class="upload-text">ここにファイルをドラッグ＆ドロップ</div>
+    <nav id="menu">
+      <a href="home.html">HOME</div></a>
+      <a href="orderInsert.html">注文書作成</a>
+      <a href="deliveryInsert.html">納品書作成</a>
+      <!-- 他のリンクもここに追加可能 -->
+    </nav>
+  </header>
+
+  <div class="container">
+    <div class="upload-area" id="drop-area">
+      <div class="upload-icon">⬆</div>
+      <div class="upload-text">ここにファイルをドラッグ＆ドロップ</div>
+    </div>
+
+    <div class="file-select">
+      <input type="text" class="file-name" placeholder="選択したファイル名選択" readonly id="file-name">
+      <input type="file" id="file-input" style="display: none;">
+      <button class="button" onclick="document.getElementById('file-input').click()">参照</button>
+    </div>
+
+    <div>
+      <a href="./statisticsHome.html"><button class="button-back">戻る</button></a>
+      <button class="button-upload">アップロード</button>
+    </div>
+
   </div>
-
-  <div class="file-select">
-    <input type="text" class="file-name" placeholder="選択したファイル名選択" readonly id="file-name">
-    <input type="file" id="file-input" style="display: none;">
-    <button class="button" onclick="document.getElementById('file-input').click()">参照</button>
-  </div>
-
-  <div>
-    <a href="./statisticsHome.html"><button class="button">戻る</button></a>
-    <button class="button">アップロード</button>
-  </div>
-
   <script>
     const fileInput = document.getElementById('file-input');
     const fileNameField = document.getElementById('file-name');
@@ -96,7 +246,13 @@
         fileNameField.value = files[0].name;
       }
     });
+
+    function toggleMenu() {
+      const menu = document.getElementById('menu');
+      menu.classList.toggle('show-menu');
+    }
   </script>
 
 </body>
+
 </html>

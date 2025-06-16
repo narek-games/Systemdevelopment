@@ -12,7 +12,7 @@
             background-color: white;
         }
 
-       
+
 
         h1 {
             text-align: center;
@@ -38,6 +38,11 @@
             width: 100%;
             padding: 6px;
             box-sizing: border-box;
+
+        }
+
+        .readonly {
+            background-color: lightgray
         }
 
         table {
@@ -68,7 +73,7 @@
             width: 150px;
             padding: 12px;
             font-size: 16px;
-            background: #dce9f9;
+            background-color: cornflowerblue;
             border: 1px solid #ccc;
             border-radius: 8px;
             cursor: pointer;
@@ -76,7 +81,54 @@
 
         .reset-btn:hover,
         .submit-btn:hover {
-            background: #bcd4f7;
+            background: blue;
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #333;
+            color: white;
+            padding: 14px 20px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            opacity: 0;
+            animation: fadeinout 4s ease forwards;
+        }
+
+        .toast i {
+            font-style: normal;
+            background: #4caf50;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        @keyframes fadeinout {
+            0% {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            10%,
+            90% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
         }
     </style>
 </head>
@@ -88,7 +140,7 @@
         <div class="grid">
             <div class="form-group">
                 <label>納品ID</label>
-                <input type="text" value="DE000001" readonly>
+                <input type="text" class="readonly" value="DE000001" readonly>
             </div>
             <div class="form-group">
                 <label>日付</label>
@@ -101,13 +153,13 @@
                     const yyyy = today.getFullYear();
                     const mm = String(today.getMonth() + 1).padStart(2, '0');
                     const dd = String(today.getDate()).padStart(2, '0');
-                    document.getElementById('deliveryDate').value = `${yyyy}-${mm}-${dd}`;
+                    document.getElementById('deliveryDate').value = $;{yyyy}-$;{mm}-$;{dd};
                 });
             </script>
 
             <div class="form-group">
                 <label>顧客ID</label>
-                <input type="text" value="CU000001" readonly>
+                <input type="text" class="readonly" value="CU000001" readonly>
             </div>
             <div class="form-group">
                 <label>顧客名</label>
@@ -140,19 +192,19 @@
                 <tr class="item-row">
                     <td><input type="text" value=""></td>
                     <td><input type="number" value="" class="qty" oninput="updateRow(this)"></td>
-                    <td><input type="number" value="" class="price" oninput="updateRow(this)"radio></td>
+                    <td><input type="number" value="" class="price" oninput="updateRow(this)" radio></td>
                     <td><input type="number" value="" class="total" readonly></td>
                 </tr>
                 <tr class="item-row">
                     <td><input type="text" value=""></td>
                     <td><input type="number" value="" class="qty" oninput="updateRow(this)"></td>
-                    <td><input type="number" value="" class="price" oninput="updateRow(this)"readonly></td>
+                    <td><input type="number" value="" class="price" oninput="updateRow(this)" readonly></td>
                     <td><input type="number" value="" class="total" readonly></td>
                 </tr>
                 <tr class="item-row">
                     <td><input type="text" value=""></td>
                     <td><input type="number" value="" class="qty" oninput="updateRow(this)"></td>
-                    <td><input type="number" value="" class="price" oninput="updateRow(this)"readonly></td>
+                    <td><input type="number" value="" class="price" oninput="updateRow(this)" readonly></td>
                     <td><input type="number" value="" class="total" readonly></td>
                 </tr>
             </tbody>
@@ -175,7 +227,7 @@
 
     <script>
         const taxRate = 0.1;
-        
+
         function updateRow(input) {
             const row = input.closest('.item-row');
             const qty = parseFloat(row.querySelector('.qty').value) || 0;
@@ -195,6 +247,21 @@
                 updateRow(row.querySelector('.qty'));
             });
         }
+
+         function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
+        }
+
+        // 保存ボタンにトーストを紐づけ
+        document.querySelector('.submit-btn').addEventListener('click', function (e) {
+            e.preventDefault(); // フォーム送信をブロック（必要なら削除）
+            showToast('納品書を保存しました');
+        });
+
+
     </script>
 </body>
 

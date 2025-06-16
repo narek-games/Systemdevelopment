@@ -1,22 +1,29 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
   <meta charset="UTF-8">
   <title>納品書編集画面</title>
   <style>
     body {
-      font-family: sans-serif;
+      font-family: "Hiragino Kaku Gothic ProN", sans-serif;
       margin: 20px;
     }
+
     h1 {
       font-size: 20px;
     }
+
+    .date,
     .readonly-field {
       margin-bottom: 10px;
     }
+
+    label,
     .readonly-label {
       font-weight: bold;
     }
+
     .readonly-value {
       display: inline-block;
       padding: 4px 8px;
@@ -24,66 +31,143 @@
       border: 1px solid #ccc;
       width: 300px;
     }
-    input[type="text"] {
-      width: 300px;
-      margin-bottom: 10px;
+
+    .grid {
+      /*原因あり*/
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px 40px;
+      margin-bottom: 20px;
+      font-family: "Hiragino Kaku Gothic ProN", sans-serif;
     }
+
+    input[type="text"],
+    input[type="date"],
+    input[type="number"] {
+      width: 100%;
+      padding: 6px;
+      box-sizing: border-box;
+      font-family: "Hiragino Kaku Gothic ProN", sans-serif;
+    }
+
+
     table {
       border-collapse: collapse;
       margin-top: 20px;
       width: 100%;
     }
-    table, th, td {
+
+    table,
+    th,
+    td {
       border: 1px solid black;
     }
-    th, td {
+
+    th,
+    td {
       padding: 5px;
       text-align: center;
+      border: 1px solid #999;
+      padding: 8px;
     }
+
     .button-group {
       margin-top: 20px;
     }
+
     button {
       font-size: 16px;
       padding: 10px 20px;
       margin-right: 10px;
     }
+
     .back-button {
-      background-color: #cddffb;
+      background-color: whitesmoke;
+      width: 150px;
+      padding: 12px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      cursor: pointer;
     }
+
     .delete-button {
       background-color: #ff9999;
+      width: 150px;
+      padding: 12px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      cursor: pointer;
     }
+
     .save-button {
-      background-color: #cddffb;
+      background-color: cornflowerblue;
+      width: 150px;
+      padding: 12px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      cursor: pointer;
     }
+
     .add-product {
       margin-top: 10px;
+
     }
-    a {
-      color: blue;
-      text-decoration: underline;
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    .save-button:hover {
+      background-color: blue;
+      ;
+    }
+
+    .delete-button:hover {
+      background-color: red;
+    }
+
+    .back-button:hover {
+      background-color: gray;
     }
   </style>
 </head>
+
 <body>
 
   <h1>納品書編集画面</h1>
+  <div class="grid">
+    <div class="form-group">
+      <label>納品ID</label>
+      <input type="text" class="readonly" value="DE000001" readonly>
+    </div>
+    <div class="form-group">
+      <label>日付</label>
+      <input type="date" id="deliveryDate">
+    </div>
 
-  <div class="readonly-field">
-    <span class="readonly-label">納品ID</span>：
-    <span class="readonly-value">DE000001</span>
-  </div>
-  <div class="readonly-field">
-    <label>日付 <input type="text" value="2022年10月16日"></label>
-  </div>
-  <div class="readonly-field">
-    <span class="readonly-label">顧客ID</span>：
-    <span class="readonly-value">CU000001</span>
-  </div>
-  <div class="readonly-field">
-    <span class="readonly-label">顧客名</span>：
-    <span class="readonly-value">大阪医療専門学校</span>
+    <script>
+      window.addEventListener('DOMContentLoaded', () => {
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        document.getElementById('deliveryDate').value = `${yyyy}-${mm}-${dd}`;
+      });
+    </script>
+
+    <div class="form-group">
+      <label>顧客ID</label>
+      <input type="text" class="readonly" value="CU000001" readonly>
+    </div>
+    <div class="form-group">
+      <label>顧客名</label>
+      <input type="text" value="大阪情報専門学校">
+    </div>
   </div>
 
   <table>
@@ -134,4 +218,5 @@
   </div>
 
 </body>
+
 </html>

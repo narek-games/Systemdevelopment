@@ -28,18 +28,33 @@ try {
   <title>納品書管理画面</title>
   <style>
     body {
-      font-family: sans-serif;
+      font-family: "Hiragino Kaku Gothic ProN", sans-serif;
+      background: #f4f4f4;
+      background-color: white;
     }
 
-    h2 {
-      text-align: center;
-      margin-top: 30px;
+    header h1 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      color: white;
+      background-color: forestgreen;
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      border-radius: 16px;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-bottom: 30px;
+      margin-bottom: 15px;
     }
 
     th,
@@ -54,30 +69,35 @@ try {
     }
 
     .btn-container {
-      text-align: center;
-      margin-bottom: 40px;
       display: flex;
       justify-content: center;
       gap: 40px;
+      margin-bottom: 40px;
     }
 
-    /* home.htmlのボタンデザインを反映 */
-    .main-btn {
-      display: inline-block;
-      width: 250px;
-      margin: 0;
-      padding: 15px;
-      font-size: 20px;
-      background-color: #c7dbf3;
-      border: 1px solid #888;
+    .reset-btn,
+    .submit-btn {
+      width: 150px;
+      padding: 12px;
+      font-size: 16px;
+      background-color: cornflowerblue;
+      border: 1px solid #ccc;
       border-radius: 8px;
-      box-shadow: 2px 2px 3px #888;
-      color: black;
       cursor: pointer;
+      color: black;
     }
 
-    .main-btn:hover {
-      background-color: #a5c6ed;
+    .reset-btn {
+      background-color: whitesmoke;
+    }
+
+    .reset-btn:hover {
+      background: gray;
+    }
+
+    .submit-btn:hover {
+      background: blue;
+      color: white;
     }
 
     .edit-btn,
@@ -88,6 +108,7 @@ try {
       border: none;
       border-radius: 4px;
       cursor: pointer;
+      font-size: 14px;
     }
 
     .edit-btn {
@@ -106,45 +127,49 @@ try {
 
 <body>
 
-  <h2>納品書管理画面</h2>
+  <header>
+    <h1>納品書管理画面</h1>
+  </header>
 
-  <table>
-    <thead>
-      <tr>
-        <th>納品ID</th>
-        <th>顧客ID</th>
-        <th>更新日</th>
-        <th>顧客名</th>
-        <th></th>
-        <th></th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      <?php if (count($deliveries) > 0): ?>
-        <?php foreach ($deliveries as $delivery): ?>
-          <tr>
-            <td><?= htmlspecialchars($delivery['delivery_id']) ?></td>
-            <td><?= htmlspecialchars($delivery['customer_id']) ?></td>
-            <td><?= htmlspecialchars($delivery['formatted_date']) ?></td>
-            <td><?= htmlspecialchars($delivery['customer_name']) ?></td>
-            <td><button class="edit-btn">編集</button></td>
-            <td><button class="delete-btn">削除</button></td>
-            <td><button class="print-btn">印刷</button></td>
-          </tr>
-        <?php endforeach; ?>
-      <?php else: ?>
+  <main>
+    <table>
+      <thead>
         <tr>
-          <td colspan="7">納品データが存在しません。</td>
+          <th>納品ID</th>
+          <th>顧客ID</th>
+          <th>更新日</th>
+          <th>顧客名</th>
+          <th></th>
+          <th></th>
+          <th></th>
         </tr>
-      <?php endif; ?>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+        <?php if (count($deliveries) > 0): ?>
+          <?php foreach ($deliveries as $delivery): ?>
+            <tr>
+              <td><?= htmlspecialchars($delivery['delivery_id']) ?></td>
+              <td><?= htmlspecialchars($delivery['customer_id']) ?></td>
+              <td><?= htmlspecialchars($delivery['formatted_date']) ?></td>
+              <td><?= htmlspecialchars($delivery['customer_name']) ?></td>
+              <td><a href="deliveryUpdate.php" class="edit-btn">編集</a></td>
+              <td><a href="deliveryDelete.php" class="delete-btn">削除</a></td>
+              <td><a href="deliveryPrint.php" class="print-btn">印刷</a></td>
+            </tr>
+          <?php endforeach; ?>
+        <?php else: ?>
+          <tr>
+            <td colspan="7">納品データが存在しません。</td>
+          </tr>
+        <?php endif; ?>
+      </tbody>
+    </table>
 
-  <div class="btn-container">
-    <button class="main-btn" onclick="location.href='home.html'">戻る</button>
-    <button class="main-btn" onclick="location.href='deliveryInsert.php'">新規納品書作成</button>
-  </div>
+    <div class="btn-container">
+      <a href="home.html"><button class="reset-btn">戻る</button></a>
+      <a href="deliveryInsert.php"><button class="submit-btn">新規納品書作成</button></a>
+    </div>
+  </main>
 
 </body>
 

@@ -157,6 +157,24 @@
         .submit-btn:hover {
             background: blue;
         }
+
+        .edit-link {
+            color: blue;
+            text-decoration: underline;
+            font-weight: bold;
+        }
+
+        .delete-link {
+            color: red;
+            text-decoration: underline;
+            font-weight: bold;
+        }
+
+        .print-link {
+            color: black;
+            text-decoration: underline;
+            font-weight: bold;
+        }
     </style>
 </head>
 
@@ -177,11 +195,11 @@
             <td>CU000001</td>
             <td>2022年10月17日</td>
             <td>大阪情報専門学校</td>
-            <td><a href="deliveryUpdate.html">編集</a>
+            <td><a class="edit-link" href="deliveryUpdate.html">編集</a>
             </td>
-            <td><a href="deliveryDelete.php">削除</a>
+            <td><a class="delete-link" href="#">削除</a>
             </td>
-            <td><a href="deliveryPrint.html">印刷</a>
+            <td><a class="print-link" href="deliveryPrint.html">印刷</a>
             </td>
         </tr>
     </table>

@@ -74,11 +74,18 @@
       color: white;
     }
 
-    a.edit,
-    a.delete {
+    a.edit {
       margin: 0 5px;
       color: blue;
       text-decoration: underline;
+      cursor: pointer;
+    }
+
+    a.delete {
+      margin: 0 5px;
+      color: red;
+      text-decoration: underline;
+      font-weight: bold;
       cursor: pointer;
     }
 
@@ -136,7 +143,7 @@
         <td>2022年10月16日</td>
         <td><span class="status pending">未納品</span></td>
         <td>
-          <a href="#" class="edit">編集</a>
+          <a href="orderUpdate.html" class="edit">編集</a>
           <a href="#" class="delete">削除</a>
         </td>
       </tr>
@@ -146,8 +153,8 @@
         <td>2022年10月17日</td>
         <td><span class="status done">納品済</span></td>
         <td>
-          <span class="disabled">編集</span>
-          <span class="disabled">削除</span>
+          <a href="orderUpdate.html" class="edit">編集</a>
+          <a href="#" class="delete">削除</a>
         </td>
       </tr>
       <tr>
@@ -156,7 +163,7 @@
         <td>2022年10月18日</td>
         <td><span class="status pending">未納品</span></td>
         <td>
-          <a href="#" class="edit">編集</a>
+          <a href="orderUpdate.html" class="edit">編集</a>
           <a href="#" class="delete">削除</a>
         </td>
       </tr>

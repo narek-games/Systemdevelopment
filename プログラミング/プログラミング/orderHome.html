@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
-
+ 
 <head>
   <meta charset="UTF-8">
   <title>注文書管理画面</title>
@@ -11,26 +11,26 @@
       background-color: white;
       padding: 20px;
     }
-
+ 
     h1 {
       text-align: center;
       margin-bottom: 30px;
     }
-
+ 
     .search-container {
       display: flex;
       justify-content: center;
       gap: 10px;
       margin-bottom: 20px;
     }
-
+ 
     .search-container input[type="text"] {
       padding: 8px;
       width: 300px;
       font-size: 16px;
       box-sizing: border-box;
     }
-
+ 
     .search-container button {
       padding: 8px 12px;
       font-size: 16px;
@@ -39,48 +39,48 @@
       border-radius: 6px;
       cursor: pointer;
     }
-
+ 
     .search-container button:hover {
       background-color: #bcd4f7;
     }
-
+ 
     table {
       width: 100%;
       border-collapse: collapse;
       margin-bottom: 20px;
     }
-
+ 
     table th,
     table td {
       border: 1px solid #999;
       padding: 10px;
       text-align: center;
     }
-
+ 
     .status {
       font-weight: bold;
       padding: 4px 8px;
       border-radius: 4px;
       display: inline-block;
     }
-
+ 
     .status.pending {
       background-color: orange;
       color: white;
     }
-
+ 
     .status.done {
       background-color: green;
       color: white;
     }
-
+ 
     a.edit {
       margin: 0 5px;
       color: blue;
       text-decoration: underline;
       cursor: pointer;
     }
-
+ 
     a.delete {
       margin: 0 5px;
       color: red;
@@ -88,18 +88,18 @@
       font-weight: bold;
       cursor: pointer;
     }
-
+ 
     .disabled {
       color: gray;
       margin: 0 5px;
     }
-
+ 
     .button-group {
       display: flex;
       justify-content: center;
       gap: 40px;
     }
-
+ 
     .back,
     .create {
       width: 200px;
@@ -110,22 +110,22 @@
       border-radius: 8px;
       cursor: pointer;
     }
-
+ 
     .back:hover,
     .create:hover {
       background-color: blue;
     }
   </style>
 </head>
-
+ 
 <body>
   <h1>注文書管理画面</h1>
-
+ 
   <div class="search-container">
     <input type="text" placeholder="顧客名または注文ID">
     <button>🔍</button>
   </div>
-
+ 
   <table>
     <thead>
       <tr>
@@ -169,11 +169,23 @@
       </tr>
     </tbody>
   </table>
-
+ 
   <div class="button-group">
     <button class="back" onclick="location.href='home.html'">戻る</button>
     <button class="create" onclick="location.href='orderInsert.html'">新規注文書作成</button>
   </div>
 </body>
-
+<script>
+  // 削除リンクにイベントリスナーを追加
+  document.querySelectorAll('.delete').forEach(function(button) {
+    button.addEventListener('click', function(event) {
+      event.preventDefault(); // リンクのデフォルト動作を無効にする
+      if (confirm('この注文を削除しますか？')) {
+        const row = button.closest('tr'); // ボタンが属している行を取得
+        row.remove(); // 行を削除
+      }
+    });
+  });
+</script>
+ 
 </html>

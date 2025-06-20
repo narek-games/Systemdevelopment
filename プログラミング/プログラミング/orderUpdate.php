@@ -99,8 +99,8 @@ try {
   注文ID: <input type="text" value="<?= htmlspecialchars($order['order_id']) ?>" readonly>
   作成日: <input type="text" value="<?= date('Y年m月d日H時i分s秒', strtotime($order['created_at'])) ?>" readonly>
   状態:
-  <input type="radio" name="status" <?= $order['status'] === '未納品' ? 'checked' : '' ?>>未納品
-  <input type="radio" name="status" <?= $order['status'] === '納品済' ? 'checked' : '' ?>>納品済
+  <input type="radio" name="status" <?= $order['order_state'] === '未納品' ? 'checked' : '' ?>>未納品
+  <input type="radio" name="status" <?= $order['order_state'] === '納品済' ? 'checked' : '' ?>>納品済
 </p>
 <p>
   顧客ID: <input type="text" value="<?= htmlspecialchars($order['customer_id']) ?>" readonly>

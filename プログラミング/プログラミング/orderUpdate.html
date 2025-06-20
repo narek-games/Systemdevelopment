@@ -1,21 +1,25 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
   <meta charset="UTF-8">
   <title>MBSアプリ - 注文書編集画面</title>
   <style>
     /* ページ全体の基本スタイル */
-    html, body {
+    html,
+    body {
       margin: 0;
       padding: 0;
       font-family: "Hiragino Kaku Gothic ProN", sans-serif;
       background-color: white;
     }
+
     /* ヘッダーのタイトル文字 */
     header h1 {
       margin: 0;
       font-size: 20px;
     }
+
     /* ヘッダー部分のデザイン */
     header {
       position: sticky;
@@ -29,6 +33,7 @@
       flex-wrap: wrap;
       border-radius: 16px;
     }
+
     /* ハンバーガーメニューアイコン */
     .menu-icon {
       display: none;
@@ -36,12 +41,14 @@
       cursor: pointer;
       padding: 5px;
     }
+
     .menu-icon div {
       background-color: white;
       height: 3px;
       margin: 4px 0;
       width: 25px;
     }
+
     /* ナビゲーションメニュー */
     nav {
       display: flex;
@@ -49,20 +56,24 @@
       gap: 10px;
       margin-top: 10px;
     }
+
     nav a {
       color: white;
       padding: 8px 16px;
       text-decoration: none;
       border-radius: 5px;
     }
+
     nav a:hover {
       background-color: green
     }
+
     /* 画面幅が狭いときのメニュー表示 */
     @media (max-width: 768px) {
       .menu-icon {
         display: flex;
       }
+
       nav {
         display: none;
         flex-direction: column;
@@ -70,21 +81,25 @@
         background-color: blue;
         padding: 10px 0;
       }
+
       nav.show-menu {
         display: flex;
       }
     }
+
     /* テーブルのデザイン */
     table {
       border-collapse: collapse;
       margin: 0 auto 20px;
     }
+
     table th,
     table td {
       border: 1px solid #999;
       padding: 10px;
       text-align: center;
     }
+
     /* 納品済・未納品の状態セルの色分け */
     .status-green {
       color: white;
@@ -93,6 +108,7 @@
       border-radius: 4px;
       display: inline-block;
     }
+
     .status-red {
       color: white;
       background-color: orange;
@@ -100,6 +116,7 @@
       border-radius: 4px;
       display: inline-block;
     }
+
     /* 下部ボタンの配置 */
     .button-group {
       display: flex;
@@ -107,6 +124,7 @@
       gap: 40px;
       margin-top: 20px;
     }
+
     /* 共通ボタンデザイン */
     .btn-common {
       width: 200px;
@@ -118,9 +136,11 @@
       cursor: pointer;
       color: white;
     }
+
     .btn-common:hover {
       background-color: blue;
     }
+
     /* 削除ボタン */
     .btn-red {
       background: none;
@@ -131,6 +151,7 @@
       cursor: pointer;
       margin: 10px;
     }
+
     /* 行追加ボタン */
     .btn-plus {
       background-color: cornflowerblue;
@@ -337,4 +358,5 @@
     };
   </script>
 </body>
+
 </html>

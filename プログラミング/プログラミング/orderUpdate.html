@@ -4,70 +4,155 @@
 <meta charset="UTF-8">
 <title>MBSアプリ</title>
 <style>
-  body{
-    display: flex; 
-    flex-direction: column; 
-    align-items: center; 
-    margin: 20px;
-  }
-  table, th, td {
-    border: 1px solid #333;
-    border-collapse: collapse;
-  }
-  th, td {
-    padding: 5px 10px;
-    text-align: center;
-  }
-  .btn {
-    width: 170px;
-    height: 40px;
-    font-size: 18px;
-    margin: 10px;
-    background-color: #dbe7f9;
-    color: black;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  .btn:hover{
-    background-color: #4d7bc1;
-  }
-  .btn-delete{
-    position: absolute;
-    bottom: -40px;
-    left: 0;
-    width: 70px;
-    height: 30px;
-    font-size: 14px;
-    background-color: red;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  .btn-addRow{
-    position: absolute;
-    right: 0;
-    bottom: -40px;
-    width: 30px;
-    height: 30px;
-    font-size: 16px;
-    font-weight: bold;
-    border-radius: 5px;
-    border: none;
-    cursor: pointer;
-  }
-  .status-red {
-    color: red;
-  }
-  .status-green {
-    color: green;
-  }
-</style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+    }
+    table, th, td {
+      border: 1px solid #333;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 5px 10px;
+      text-align: center;
+    }
+    .btn {
+      width: 170px;
+      height: 40px;
+      font-size: 18px;
+      margin: 10px;
+      background-color: #dbe7f9;
+      color: black;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      text-align: center;
+    }
+    .button-group {
+      text-align: center;
+    }
+    .btn:hover{
+      background-color: #4d7bc1;
+    }
+    .btn-delete{
+      position: absolute;
+      bottom: -40px;
+      left: 0;
+      width: 70px;
+      height: 30px;
+      font-size: 14px;
+      background-color: red;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .btn-addRow{
+      position: absolute;
+      right: 0;
+      bottom: -40px;
+      width: 30px;
+      height: 30px;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 5px;
+      border: none;
+      cursor: pointer;
+    }
+
+    .status-red {
+      color: red;
+    }
+    .status-green {
+      color: green;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      color: white;
+      background-color: forestgreen;
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      border-radius: 16px;
+    }
+
+    .menu-icon {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+      padding: 5px;
+    }
+
+    .menu-icon div {
+      background-color: white;
+      height: 3px;
+      margin: 4px 0;
+      width: 25px;
+    }
+
+    nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    nav a {
+      color: white;
+      padding: 8px 16px;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+
+    @media (max-width: 768px) {
+      .menu-icon {
+        display: flex;
+      }
+      nav {
+        display: none;
+        flex-direction: column;
+        width: 100%;
+        background-color: blue;
+        padding: 10px 0;
+      }
+      nav.show-menu {
+        display: flex;
+      }
+    }
+
+    nav a:hover {
+      background-color: green
+    }
+
+    .show-menu {
+      display: flex;
+    }
+  </style>
 </head>
 
 <body>
-<h2>注文書編集画面</h2>
+  <header>
+    <h1>注文書編集画面</h1>
+    <div class="menu-icon" onclick="toggleMenu()">
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
+    <nav id="menu">
+      <a href="home.html">HOME</a>
+      <a href="orderInsert.html">注文書作成</a>
+      <a href="deliveryInsert.html">納品書作成</a>
+    </nav>
+  </header>
 <!--DBの連携 (最後にやる)-->
 <p>
   注文ID: <input type="text" value="OR000001" readonly>
@@ -104,11 +189,15 @@
   <button class="btn-delete" onclick="deleteCheckedRows()">削除</button>
   <button class="btn-addRow" onclick="addRow()">+</button>
 </div>
-<p>
+<p class="button-group">
   <button class="btn" onclick="location.href='orderHome.html'">戻る</button>
   <button class="btn" onclick="saveTableState()">保存</button>
 </p>
 <script>
+  function toggleMenu() {
+    const menu = document.getElementById('menu');
+    menu.classList.toggle('show-menu');
+  }
   //入力が空かどうかをチェック　商品欄等が未入力の場合納品状態の欄が入力されないようにする
   function updateStatusOnInput(event) {
     const row = event.target.closest("tr");

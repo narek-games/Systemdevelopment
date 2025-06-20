@@ -316,7 +316,17 @@
       });
     }
 
-    window.onload = loadTableState;
+    window.onload = function () {
+  loadTableState();
+  addRow({
+    name: "日経コンピュータ　11号",
+    orderQty: 1,
+    remainQty: 0,
+    price: 1300,
+    note: ""
+  });
+};
+
   </script>
 </body>
 </html>

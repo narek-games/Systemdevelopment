@@ -1,245 +1,252 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
   <meta charset="UTF-8">
-  <title>納品書編集画面</title>
+  <title>顧客情報アップロード画面</title>
   <style>
-    body {
-      font-family: "Hiragino Kaku Gothic ProN", sans-serif;
+    * {
       margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
- 
-    /* ▼▼▼ ヘッダースタイル ▼▼▼ */
-    .header {
-      background-color: green;
-      color: white;
+
+    body {
+      font-family: sans-serif;
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 15px 40px;
-      border-radius: 0 0 20px 20px;
+      flex-direction: column;
+      height: 100vh;
+      background-color: white;
     }
- 
-    .header-title {
-      font-size: 20px;
-      font-weight: bold;
-    }
- 
-    .nav-links a {
+
+    .header {
+      background-color: blue;
       color: white;
-      text-decoration: none;
-      margin-left: 30px;
-      font-size: 16px;
-    }
- 
-    .nav-links a:hover {
-      text-decoration: underline;
-    }
-    /* ▲▲▲ ヘッダーここまで ▲▲▲ */
- 
-    h1 {
+      padding: 10px 20px;
       font-size: 20px;
-      margin: 20px;
     }
- 
-    .date,
-    .readonly-field {
+
+    .container {
+      display: flex;
+      flex: 1;
+      min-height: 0;
+      height: calc(100vh - 50px);
+      align-items: stretch;
+    }
+
+    .sidebar {
+      width: 200px;
+      background-color: #f4f4f4;
+      border-right: 1px solid #ccc;
+      padding: 20px;
+      transition: width 0.3s;
+    }
+
+    .sidebar.closed {
+      width: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .sidebar ul {
+      list-style: none;
+    }
+
+    .sidebar li {
+      margin: 10px 0;
+    }
+
+    .sidebar hr {
+      border: none;
+      border-top: 1px solid #aaa;
+    }
+
+    .main-content {
+      flex: 1;
+      padding: 40px;
+      margin-top: 60px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+
+    .menu-toggle {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      width: 40px;
+      height: 40px;
       margin-bottom: 10px;
     }
- 
-    label,
-    .readonly-label {
-      font-weight: bold;
-    }
- 
-    .readonly-value {
-      display: inline-block;
-      padding: 4px 8px;
-      background-color: #f0f0f0;
-      border: 1px solid #ccc;
-      width: 300px;
-    }
- 
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px 40px;
-      margin: 0 20px 20px 20px;
-    }
- 
-    input[type="text"],
-    input[type="date"],
-    input[type="number"] {
-      width: 100%;
-      padding: 6px;
-      box-sizing: border-box;
-      font-family: "Hiragino Kaku Gothic ProN", sans-serif;
-    }
- 
-    table {
-      border-collapse: collapse;
-      margin: 0 20px 20px 20px;
-      width: calc(100% - 40px);
-    }
- 
-    table, th, td {
-      border: 1px solid black;
-    }
- 
-    th, td {
-      padding: 8px;
-      text-align: center;
-      border: 1px solid #999;
-    }
- 
-    .button-group {
-      margin: 20px;
-    }
- 
-    button {
-      font-size: 16px;
-      padding: 10px 20px;
-      margin-right: 10px;
-    }
- 
-    .back-button {
-      background-color: whitesmoke;
-      width: 150px;
-      padding: 12px;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      cursor: pointer;
-    }
- 
-    .delete-button {
-      background-color: #ff9999;
-      width: 150px;
-      padding: 12px;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      cursor: pointer;
-    }
- 
-    .save-button {
-      background-color: cornflowerblue;
-      width: 150px;
-      padding: 12px;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      cursor: pointer;
-    }
- 
-    .add-product {
-      margin: 0 20px 10px 20px;
-    }
- 
-    .form-group label {
+
+    .menu-toggle .bar {
       display: block;
-      margin-bottom: 5px;
-      font-weight: bold;
+      width: 28px;
+      height: 4px;
+      margin: 4px 0;
+      background-color: #333;
+      border-radius: 2px;
+      transition: 0.3s;
     }
- 
-    .save-button:hover {
+
+    .upload-area {
+      border: 2px solid black;
+      padding: 80px;
+      margin: 40px 0;
+      width: 100%;
+      max-width: 800px;
+      height: 300px;
+      position: relative;
+      font-size: 2rem;
+    }
+
+    .upload-icon {
+      font-size: 100px;
+    }
+
+    .upload-text {
+      margin-top: 20px;
+      color: #333;
+      font-size: 1.5em;
+    }
+
+    .file-select {
+      margin-top: 30px;
+      width: 100%;
+      max-width: 800px;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      font-size: 1.2em;
+    }
+
+    .button-upload {
+      background-color: cornflowerblue;
+      width: 200px;
+      padding: 20px;
+      margin: 30px 20px;
+      font-size: 1.3em;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .button-back {
+      width: 200px;
+      padding: 20px;
+      margin: 30px 20px;
+      font-size: 1.3em;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .button {
+      width: 200px;
+      padding: 20px;
+      margin: 30px 20px;
+      font-size: 1.3em;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background-color: cornflowerblue;
+      cursor: pointer;
+    }
+
+    .button:hover {
       background-color: blue;
     }
- 
-    .back-button:hover {
-      background-color: gray;
+
+    .button-back:hover {
+      background: gray;
+    }
+
+    .button-upload:hover {
+      background: blue;
+    }
+
+    .button:active {
+      box-shadow: inset 2px 2px 5px #666;
+    }
+
+    .file-name {
+      padding: 20px;
+      width: 400px;
+      font-size: 1.2em;
     }
   </style>
 </head>
- 
+
 <body>
- 
- 
-  <div class="header">
-    <div class="header-title">納品書編集画面</div>
-    <div class="nav-links">
-      <a href="./home.html">HOME</a>
- 
-    </div>
+  <header class="header">MBS</header>
+  <div class="container">
+    <nav class="sidebar" id="sidebar">
+      <ul>
+        <li><a href="home.html">HOME</a></li>
+        <hr>
+        <li><a href="orderInsert.html">注文書作成</a></li>
+        <hr>
+        <li><a href="deliveryInsert.html">納品書作成</a></li>
+      </ul>
+    </nav>
+    <main class="main-content">
+      <button class="menu-toggle" onclick="document.getElementById('sidebar').classList.toggle('closed')">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </button>
+      <h1>顧客情報アップロード画面</h1>
+      <div class="upload-area" id="drop-area">
+        <div class="upload-icon">⬆</div>
+        <div class="upload-text">ここにファイルをドラッグ＆ドロップ</div>
+      </div>
+      <div class="file-select">
+        <input type="text" class="file-name" placeholder="選択したファイル名選択" readonly id="file-name">
+        <input type="file" id="file-input" style="display: none;">
+        <button class="button" onclick="document.getElementById('file-input').click()">参照</button>
+      </div>
+      <div>
+        <a href="./statisticsHome.html"><button class="button-back">戻る</button></a>
+        <button class="button-upload">アップロード</button>
+      </div>
+    </main>
   </div>
- 
- 
- 
-  <div class="grid">
-    <div class="form-group">
-      <label>納品ID</label>
-      <input type="text" class="readonly" value="DE000001" readonly>
-    </div>
-    <div class="form-group">
-      <label>日付</label>
-      <input type="date" id="deliveryDate">
-    </div>
- 
-    <script>
-      window.addEventListener('DOMContentLoaded', () => {
-        const today = new Date();
-        const yyyy = today.getFullYear();
-        const mm = String(today.getMonth() + 1).padStart(2, '0');
-        const dd = String(today.getDate()).padStart(2, '0');
-        document.getElementById('deliveryDate').value = `${yyyy}-${mm}-${dd}`;
-      });
-    </script>
- 
-    <div class="form-group">
-      <label>顧客ID</label>
-      <input type="text" class="readonly" value="CU000001" readonly>
-    </div>
-    <div class="form-group">
-      <label>顧客名</label>
-      <input type="text" value="大阪情報専門学校">
-    </div>
-  </div>
- 
-  <table>
-    <thead>
-      <tr>
-        <th>品名</th>
-        <th>数量</th>
-        <th>未納品数量</th>
-        <th>単価</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a href="#">週刊BCN 10/17</a></td>
-        <td>1</td>
-        <td>1</td>
-        <td>363</td>
-      </tr>
-      <tr>
-        <td><a href="#">日経コンピュータ 11月号</a></td>
-        <td>1</td>
-        <td>1</td>
-        <td>1,300</td>
-      </tr>
-      <tr>
-        <td><a href="#">SoftwareDesign 11月号</a></td>
-        <td>1</td>
-        <td>1</td>
-        <td>1,342</td>
-      </tr>
-      <tr>
-        <td><a href="#">医療情報 第7版 医学・医療編</a></td>
-        <td>11</td>
-        <td>11</td>
-        <td>3,740</td>
-      </tr>
-    </tbody>
-  </table>
- 
-  <div class="add-product">
-    <button onclick="location.href='orderOption.html'">商品を追加</button>
-  </div>
- 
-  <div class="button-group">
-    <a href="./deliveryHome.html"><button class="back-button">戻る</button></a>
-    <button class="save-button">保存</button>
-  </div>
- 
+  <script>
+    const fileInput = document.getElementById('file-input');
+    const fileNameField = document.getElementById('file-name');
+    const dropArea = document.getElementById('drop-area');
+
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files.length > 0) {
+        fileNameField.value = fileInput.files[0].name;
+      }
+    });
+
+    dropArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropArea.style.backgroundColor = '#eef';
+    });
+
+    dropArea.addEventListener('dragleave', () => {
+      dropArea.style.backgroundColor = '';
+    });
+
+    dropArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropArea.style.backgroundColor = '';
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        fileInput.files = files;
+        fileNameField.value = files[0].name;
+      }
+    });
+  </script>
 </body>
+
 </html>

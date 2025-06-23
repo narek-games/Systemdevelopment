@@ -94,12 +94,13 @@ function checkDB(){
         echo "<h2>注文明細</h2>";
         $stmt = $pdo->query("SELECT * FROM order_detail");
         echo "<table border='1'>
-            <tr><th>注文商品番号</th><th>注文ID</th><th>品名</th><th>未納品数量</th><th>単価</th><th>摘要</th><th>状態</th></tr>";
+            <tr><th>注文商品番号</th><th>注文ID</th><th>品名</th><th>数量</th><th>未納品数量</th><th>単価</th><th>摘要</th><th>状態</th></tr>";
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             echo "<tr>
                 <td>{$row['order_product_number']}</td>
                 <td>{$row['order_id']}</td>
                 <td>{$row['product_name']}</td>
+                <td>{$row['product_quantity']}</td>
                 <td>{$row['undelivered_quantity']}</td>
                 <td>{$row['product_price']}</td>
                 <td>{$row['product_abstract']}</td>

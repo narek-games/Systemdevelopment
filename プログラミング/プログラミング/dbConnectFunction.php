@@ -33,7 +33,7 @@ function checkDB(){
         echo "<h2>顧客</h2>";
         $stmt = $pdo->query("SELECT * FROM customer");
         echo "<table border='1'>
-            <tr><th>顧客ID</th><th>顧客名</th><th>担当者</th><th>住所</th><th>電話番号</th><th>配達先条件等</th><th>登録日</th><th>累計売上</th><th>リードタイム</th><th>納品回数</th></tr>";
+            <tr><th>顧客ID</th><th>顧客名</th><th>担当者名</th><th>住所</th><th>電話番号</th><th>配達先条件等</th><th>備考</th><th>顧客登録日</th><th>累計売上</th><th>累計リードタイム</th><th>納品回数</th></tr>";
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             echo "<tr>
                 <td>{$row['customer_id']}</td>
@@ -41,6 +41,7 @@ function checkDB(){
                 <td>{$row['customer_person']}</td>
                 <td>{$row['address']}</td>
                 <td>{$row['phone_number']}</td>
+                <td>{$row['delivery_notes']}</td>
                 <td>{$row['customer_notes']}</td>
                 <td>{$row['registration_date']}</td>
                 <td>{$row['customer_sales']}</td>
@@ -67,12 +68,13 @@ function checkDB(){
         echo "<h2>納品明細</h2>";
         $stmt = $pdo->query("SELECT * FROM delivery_detail");
         echo "<table border='1'>
-            <tr><th>納品商品番号</th><th>納品ID</th><th>注文商品番号</th></tr>";
+            <tr><th>納品商品連番</th><th>納品ID</th><th>注文商品連番</th><th>注文ID</th></tr>";
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             echo "<tr>
                 <td>{$row['delivery_product_number']}</td>
                 <td>{$row['delivery_id']}</td>
                 <td>{$row['order_product_number']}</td>
+                <td>{$row['order_id']}</td>
             </tr>";
         }
         echo "</table><br>";
@@ -94,7 +96,7 @@ function checkDB(){
         echo "<h2>注文明細</h2>";
         $stmt = $pdo->query("SELECT * FROM order_detail");
         echo "<table border='1'>
-            <tr><th>注文商品番号</th><th>注文ID</th><th>品名</th><th>数量</th><th>未納品数量</th><th>単価</th><th>摘要</th><th>状態</th></tr>";
+            <tr><th>注文商品連番</th><th>注文ID</th><th>品名</th><th>数量</th><th>未納品数量</th><th>単価</th><th>摘要</th><th>状態</th></tr>";
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             echo "<tr>
                 <td>{$row['order_product_number']}</td>

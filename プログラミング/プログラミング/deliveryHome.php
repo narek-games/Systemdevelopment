@@ -2,18 +2,31 @@
 // データベース接続用ファイルを読み込む
 require_once 'dbConnect.php';
 
-// データベースから納品データを取得する処理
+// --- 削除処理 ---
+// 削除ボタンが押され、POSTでdelete_idが送信された場合に該当レコードをDBから削除
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
+  $delete_id = $_POST['delete_id'];
+  try {
+    $stmt = $pdo->prepare('DELETE FROM delivery WHERE delivery_id = ?');
+    $stmt->execute([$delete_id]);
+  } catch (PDOException $e) {
+    echo "削除失敗: " . $e->getMessage();
+    exit;
+  }
+}
+
+// --- 納品データの取得 ---
 try {
   // SQL文を作成（納品テーブルと顧客テーブルを結合し、納品日が新しい順に並べる）
   $sql = "
         SELECT 
-            d.delivery_id,
-            d.customer_id,
-            DATE_FORMAT(d.delivery_date, '%Y年%m月%d日') AS formatted_date,
-            c.customer_name
+            d.delivery_id,              -- 納品ID
+            d.customer_id,              -- 顧客ID
+            DATE_FORMAT(d.delivery_date, '%Y年%m月%d日') AS formatted_date, -- 日付を和暦形式に
+            c.customer_name             -- 顧客名
         FROM delivery d
-        INNER JOIN customer c ON d.customer_id = c.customer_id
-        ORDER BY d.delivery_date DESC
+        INNER JOIN customer c ON d.customer_id = c.customer_id -- 顧客IDで結合
+        ORDER BY d.delivery_date DESC   -- 納品日が新しい順
     ";
   // SQLを実行
   $stmt = $pdo->query($sql);
@@ -157,20 +170,28 @@ try {
             // 取得した納品データを1件ずつ表示するループ
             foreach ($deliveries as $delivery): ?>
               <tr>
-                <!-- htmlspecialcharsでXSS対策しつつ各項目を表示 -->
+                <!-- htmlspecialcharsでXSS対策しつつ各項目を表示（納品ID、顧客ID、日付、顧客名） -->
                 <td><?= htmlspecialchars($delivery['delivery_id']) ?></td>
                 <td><?= htmlspecialchars($delivery['customer_id']) ?></td>
                 <td><?= htmlspecialchars($delivery['formatted_date']) ?></td>
                 <td><?= htmlspecialchars($delivery['customer_name']) ?></td>
-                <!-- 編集・削除・印刷ボタン（各納品データごとに表示） -->
+                <!-- 編集ボタン：該当納品データの編集画面へ遷移 -->
                 <td><a href="deliveryUpdate.php" class="edit-btn">編集</a></td>
-                <td><a href="deliveryDelete.php" class="delete-btn">削除</a></td>
+                <!-- 削除ボタン：押下時に確認ダイアログを表示し、OKなら該当データをDBから削除 -->
+                <td>
+                  <form method="post" action="" style="display:inline;" onsubmit="return confirm('本当に削除しますか？');">
+                    <input type="hidden" name="delete_id" value="<?= htmlspecialchars($delivery['delivery_id']) ?>">
+                    <button type="submit" class="delete-btn">削除</button>
+                  </form>
+                </td>
+                <!-- 印刷ボタン：納品書印刷画面へ遷移 -->
                 <td><a href="deliveryPrint.php" class="print-btn">印刷</a></td>
               </tr>
             <?php endforeach;
           else: // データが1件もない場合の表示 
             ?>
             <tr>
+              <!-- データが存在しない場合は1行でメッセージ表示 -->
               <td colspan="7">納品データが存在しません。</td>
             </tr>
           <?php endif; ?>
@@ -178,6 +199,7 @@ try {
       </table>
     </div>
 
+    <!-- 下部の操作ボタン -->
     <div class="btn-container">
       <a href="home.html"><button class="reset-btn">戻る</button></a>
       <a href="deliveryInsert.php"><button class="submit-btn">新規納品書作成</button></a>

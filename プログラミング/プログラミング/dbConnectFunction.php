@@ -1,5 +1,6 @@
 <?php
 
+// ↓統計情報確認画面(statisticsHome.php)用の関数
 function getStatistics()
 {
     $host = '10.15.153.12';
@@ -20,6 +21,7 @@ function getStatistics()
     return $statisticsStmt;
 }
 
+// DB設計確認用の関数
 function checkDB(){
     $host = '10.15.153.12';
     $dbname = 'mbs';

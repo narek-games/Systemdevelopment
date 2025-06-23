@@ -1,42 +1,19 @@
 <?php
 // データベース接続用ファイルを読み込む
 require_once 'dbConnect.php';
+require_once 'dbConnectFunction.php'; // ← 追加：DB操作関数を利用
 
 // --- 削除処理 ---
 // 削除ボタンが押され、POSTでdelete_idが送信された場合に該当レコードをDBから削除
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
   $delete_id = $_POST['delete_id'];
-  try {
-    $stmt = $pdo->prepare('DELETE FROM delivery WHERE delivery_id = ?');
-    $stmt->execute([$delete_id]);
-  } catch (PDOException $e) {
-    echo "削除失敗: " . $e->getMessage();
-    exit;
-  }
+  // 共通関数で削除処理
+  deleteDeliveryById($pdo, $delete_id);
 }
 
 // --- 納品データの取得 ---
-try {
-  // SQL文を作成（納品テーブルと顧客テーブルを結合し、納品日が新しい順に並べる）
-  $sql = "
-        SELECT 
-            d.delivery_id,              -- 納品ID
-            d.customer_id,              -- 顧客ID
-            DATE_FORMAT(d.delivery_date, '%Y年%m月%d日') AS formatted_date, -- 日付を和暦形式に
-            c.customer_name             -- 顧客名
-        FROM delivery d
-        INNER JOIN customer c ON d.customer_id = c.customer_id -- 顧客IDで結合
-        ORDER BY d.delivery_date DESC   -- 納品日が新しい順
-    ";
-  // SQLを実行
-  $stmt = $pdo->query($sql);
-  // 結果を連想配列で取得
-  $deliveries = $stmt->fetchAll(PDO::FETCH_ASSOC);
-} catch (PDOException $e) {
-  // エラーが発生した場合はメッセージを表示して終了
-  echo "データ取得失敗: " . $e->getMessage();
-  exit;
-}
+// 共通関数で納品データ一覧を取得
+$deliveries = getAllDeliveries($pdo);
 ?>
 
 <!DOCTYPE html>

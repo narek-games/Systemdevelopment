@@ -116,5 +116,44 @@ function checkDB(){
     }
 }
  
+// =============================
+// 納品データ取得・削除用関数
+// =============================
 
+/**
+ * 納品データ一覧を取得する関数
+ * @param PDO $pdo DB接続済みPDOインスタンス
+ * @return array 納品データ配列
+ */
+function getAllDeliveries($pdo) {
+    $sql = "
+        SELECT 
+            d.delivery_id,              -- 納品ID
+            d.customer_id,              -- 顧客ID
+            DATE_FORMAT(d.delivery_date, '%Y年%m月%d日') AS formatted_date, -- 日付を和暦形式に
+            c.customer_name             -- 顧客名
+        FROM delivery d
+        INNER JOIN customer c ON d.customer_id = c.customer_id -- 顧客IDで結合
+        ORDER BY d.delivery_date DESC   -- 納品日が新しい順
+    ";
+    $stmt = $pdo->query($sql);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+/**
+ * 指定した納品IDのレコードを削除する関数
+ * @param PDO $pdo DB接続済みPDOインスタンス
+ * @param string|int $delivery_id 削除対象の納品ID
+ * @return bool 成功時true、失敗時false
+ */
+function deleteDeliveryById($pdo, $delivery_id) {
+    try {
+        $stmt = $pdo->prepare('DELETE FROM delivery WHERE delivery_id = ?');
+        return $stmt->execute([$delivery_id]);
+    } catch (PDOException $e) {
+        // エラー内容を表示（本番運用時はログ出力推奨）
+        echo "削除失敗: " . $e->getMessage();
+        return false;
+    }
+}
 ?>

@@ -161,8 +161,8 @@ $deliveries = getAllDeliveries($pdo);
                     <button type="submit" class="delete-btn">削除</button>
                   </form>
                 </td>
-                <!-- 印刷ボタン：納品書印刷画面へ遷移 -->
-                <td><a href="deliveryPrint.php" class="print-btn">印刷</a></td>
+                <!-- 印刷ボタン：納品書印刷画面へ遷移（GETパラメータで情報を渡す） -->
+                <td><a href="deliveryPrint.php?delivery_id=<?= urlencode($delivery['delivery_id']) ?>&amp;customer_name=<?= urlencode($delivery['customer_name']) ?>&amp;delivery_date=<?= urlencode($delivery['formatted_date']) ?>" class="print-btn">印刷</a></td>
               </tr>
             <?php endforeach;
           else: // データが1件もない場合の表示 

@@ -18,13 +18,22 @@ $total_qty = 0;
 $total_price = 0;
 if ($delivery_id !== "") {
     // 納品IDから明細を取得
-    $stmt = $pdo->prepare('SELECT product_name, product_quantity AS qty, product_price AS price FROM delivery_detail WHERE delivery_id = ?');
+    $sql = "
+        SELECT
+            od.product_name AS name,
+            od.product_quantity AS qty,
+            od.product_price AS price
+        FROM delivery_detail AS dd
+        INNER JOIN order_detail AS od ON dd.order_id = od.order_id AND dd.order_product_number = od.order_product_number
+        WHERE dd.delivery_id = ?
+    ";
+    $stmt = $pdo->prepare($sql);
     $stmt->execute([$delivery_id]);
     $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
     // 合計数量・金額を計算
     foreach ($items as $row) {
         $total_qty += (int)$row['qty'];
-        $total_price += (int)$row['price']; // 必要に応じて数量×単価に修正
+        $total_price += (int)$row['price'] * (int)$row['qty'];
     }
 }
 ?>
@@ -295,8 +304,10 @@ if ($delivery_id !== "") {
                     <td><?php if (isset($items[$i])) echo $items[$i]["qty"]; ?></td>
                     <td><?php if (isset($items[$i])) echo '￥' . number_format($items[$i]["price"]); ?></td>
                     <td class="yen" style="text-align:right;">
-                        <?php // 品名が空欄でなければ金額に￥を付けて表示
-                        if (isset($items[$i]) && $items[$i]["name"] !== "") echo '￥' . number_format($items[$i]["price"]); ?>
+                        <?php // 金額（単価×数量）を表示
+                        if (isset($items[$i]) && $items[$i]["name"] !== "") {
+                            echo '￥' . number_format((int)$items[$i]["price"] * (int)$items[$i]["qty"]);
+                        } ?>
                     </td>
                     <td></td> <!-- 一番右の細い空白セル -->
                 </tr>

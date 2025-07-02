@@ -97,11 +97,11 @@
   <div class="grid">
     <div class="form-group">
       <label>顧客ID</label>
-      <input type="text" class="readonly" value="CU000001" readonly>
+      <input type="text" value="">
     </div>
     <div class="form-group">
       <label>顧客名</label>
-      <input type="text" value="大阪情報専門学校">
+      <input type="text" value="">
     </div>
   </div>
 
@@ -117,34 +117,22 @@
     </thead>
     <tbody>
       <tr>
-        <td contenteditable="true">週刊BCN vol.1942</td>
-        <td contenteditable="true">1</td>
-        <td contenteditable="true">363</td>
+        <td contenteditable="true"></td>
+        <td contenteditable="true"></td>
+        <td contenteditable="true"></td>
         <td contenteditable="true"></td>
       </tr>
       <tr>
-        <td contenteditable="true">日経コンピュータ 11月号</td>
-        <td contenteditable="true">1</td>
-        <td contenteditable="true">1300</td>
+        <td contenteditable="true"></td>
+        <td contenteditable="true"></td>
+        <td contenteditable="true"></td>
         <td contenteditable="true"></td>
       </tr>
       <tr>
-        <td contenteditable="true">日経ネットワーク 11月号</td>
-        <td contenteditable="true">1</td>
-        <td contenteditable="true">1300</td>
         <td contenteditable="true"></td>
-      </tr>
-      <tr>
-        <td contenteditable="true">SoftwareDesign 11月号</td>
-        <td contenteditable="true">1</td>
-        <td contenteditable="true">1342</td>
         <td contenteditable="true"></td>
-      </tr>
-      <tr>
-        <td contenteditable="true">医学書院 第7版 医学・医療編</td>
-        <td contenteditable="true">11</td>
-        <td contenteditable="true">3740</td>
-        <td contenteditable="true">978-4867058138</td>
+        <td contenteditable="true"></td>
+        <td contenteditable="true"></td>
       </tr>
       <tr>
         <td contenteditable="true"></td>
@@ -163,7 +151,7 @@
   </table>
 
   <div>
-    <button class="add-product">商品を追加</button>
+    <button class="add-product" onclick="addProductRow()">商品を追加</button>
   </div>
 
   <div class="button-container">
@@ -172,8 +160,73 @@
   </div>
 
   <script>
+function submitForm() {
+  const rows = document.querySelectorAll("tbody tr");
+  const items = [];
 
-  </script>
+  rows.forEach(row => {
+    const cells = row.querySelectorAll("td");
+    if (cells.length < 4) return;
+
+    const name = cells[0].innerText.trim();
+    const quantity = cells[1].innerText.trim();
+    const price = cells[2].innerText.trim();
+    const remark = cells[3].innerText.trim();
+
+    if (name || quantity || price || remark) {
+      items.push({
+        name,
+        quantity,
+        price,
+        remark
+      });
+    }
+  });
+
+  const customerId = document.querySelectorAll('input[type="text"]')[0].value.trim();
+
+  if (!customerId || items.length === 0) {
+    alert("顧客IDと商品情報を入力してください。");
+    return;
+  }
+
+  const payload = {
+    customerId,
+    items
+  };
+
+  fetch("orderInsertSubmit.php", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload)
+  })
+  .then(response => response.text())
+  .then(result => {
+  console.log(result);  // 確認用ログ（必要なら）
+  window.location.href = "orderHome.html";
+  })
+  .catch(error => {
+    console.error("送信エラー:", error);
+    alert("データ送信に失敗しました。");
+  });
+}
+
+function addProductRow() {
+  const tbody = document.querySelector("table tbody");
+
+  const newRow = document.createElement("tr");
+  for (let i = 0; i < 4; i++) {
+    const td = document.createElement("td");
+    td.contentEditable = "true";
+    newRow.appendChild(td);
+  }
+
+  tbody.appendChild(newRow);
+}
+
+</script>
 
 </body>
 

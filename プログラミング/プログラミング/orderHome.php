@@ -201,4 +201,13 @@ $stmt = $pdo->query($sql);
     </div>
 </body>
 
+<script>
+window.addEventListener("DOMContentLoaded", function() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("created") === "1") {
+    alert("注文書が作成されました");
+  }
+});
+</script>
+
 </html>

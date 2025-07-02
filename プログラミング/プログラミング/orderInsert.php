@@ -204,9 +204,9 @@ function submitForm() {
   })
   .then(response => response.text())
   .then(result => {
-  console.log(result);  // 確認用ログ（必要なら）
-  window.location.href = "orderHome.html";
-  })
+  // データベース挿入成功後に注文一覧へ遷移（URLパラメータ付き）
+  window.location.href = "orderHome.php?created=1";
+})
   .catch(error => {
     console.error("送信エラー:", error);
     alert("データ送信に失敗しました。");

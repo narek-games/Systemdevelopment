@@ -2,6 +2,7 @@
 // =============================
 // このファイルは納品書の印刷画面です。
 // deliveryHome.phpから顧客名・更新日・納品IDを受け取り、DBから明細を取得して表示します。
+// deliveryHome.phpから遷移する前提で作っている為、直接このページを開くと正しく表示されません。
 // =============================
 
 require_once 'dbConnect.php'; // DB接続用
@@ -18,17 +19,19 @@ $total_qty = 0;
 $total_price = 0;
 if ($delivery_id !== "") {
     // 納品IDから明細を取得
+    // delivery_detailとorder_detailを結合し、納品IDに紐づく商品情報を取得
+    // DISTINCTが無いと、同じ明細が2行以上表示されてしまうことがある
     $sql = "
-        SELECT
-            od.product_name AS name,
-            od.product_quantity AS qty,
-            od.product_price AS price
-        FROM delivery_detail AS dd
-        INNER JOIN order_detail AS od ON dd.order_id = od.order_id AND dd.order_product_number = od.order_product_number
-        WHERE dd.delivery_id = ?
+    SELECT DISTINCT
+        od.product_name AS name,
+        od.product_quantity AS qty,
+        od.product_price AS price
+    FROM delivery_detail dd
+    INNER JOIN order_detail od ON dd.order_product_number = od.order_product_number
+    WHERE dd.delivery_id = :delivery_id
     ";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute([$delivery_id]);
+    $stmt->execute([':delivery_id' => $delivery_id]);
     $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
     // 合計数量・金額を計算
     foreach ($items as $row) {
@@ -261,6 +264,7 @@ if ($delivery_id !== "") {
 
         /* 印刷時はボタンを非表示にする */
         @media print {
+
             .button-print,
             .button-back {
                 display: none !important;

@@ -197,8 +197,17 @@ $stmt = $pdo->query($sql);
 
     <div class="btn-container">
         <button class="btn" onclick="location.href='home.html'">戻る</button>
-        <button class="btn" onclick="location.href='orderInsert.html'">新規注文書作成</button>
+        <button class="btn" onclick="location.href='orderInsert.php'">新規注文書作成</button>
     </div>
 </body>
+
+<script>
+window.addEventListener("DOMContentLoaded", function() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("created") === "1") {
+    alert("注文書が作成されました");
+  }
+});
+</script>
 
 </html>

@@ -88,22 +88,54 @@
       margin-bottom: 5px;
       font-weight: bold;
     }
+
+    /* ✅ グリッドを3列に */
+.grid.grid-3col {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 20px 40px;
+  margin-bottom: 20px;
+}
+
+/* ✅ ラベル整列用 */
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+/* ✅ 編集不可な灰色の入力欄 */
+input.readonly-gray {
+  background-color: #ccc;  /* 少し濃いグレーで視認性向上 */
+  color: #333;
+  cursor: not-allowed;
+}
+
+.readonly-gray {
+    background-color: #ccc;
+    color: #333;
+  }
   </style>
 </head>
 
 <body>
 
   <h2>注文書作成画面</h2>
-  <div class="grid">
-    <div class="form-group">
-      <label>顧客ID</label>
-      <input type="text" value="">
-    </div>
-    <div class="form-group">
-      <label>顧客名</label>
-      <input type="text" value="">
-    </div>
+ <div class="grid grid-3col">
+  <div class="form-group">
+    <label>顧客ID</label>
+    <input type="text" id="customerId" name="customer_id" oninput="fetchCustomerInfo()">
   </div>
+  <div class="form-group">
+    <label>顧客名</label>
+    <input type="text" id="customerName">
+  </div>
+  <div class="form-group">
+    <label>電話番号</label>
+    <input type="text" id="phoneNumber" readonly class="readonly-gray">
+  </div>
+</div>
+
 
 
   <table>
@@ -160,6 +192,58 @@
   </div>
 
   <script>
+// 顧客情報マスタ（PHPでDBから動的生成可）
+const customerData = <?php
+    // データベースから連想配列を構築
+    $host = '10.15.153.12';
+    $dbname = 'mbs';
+    $username = 'user';
+    $password = '1212';
+
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $stmt = $pdo->query("SELECT customer_id, customer_name, phone_number FROM customer");
+    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $data = [];
+    foreach ($rows as $row) {
+      $data[$row['customer_id']] = [
+        'name' => $row['customer_name'],
+        'phone' => $row['phone_number']
+      ];
+    }
+    echo json_encode($data, JSON_UNESCAPED_UNICODE);
+  ?>;
+
+  function fetchCustomerInfo() {
+    const customerId = document.getElementById("customerId").value.trim();
+
+    if (customerId === "") {
+      document.getElementById("customerName").value = "";
+      document.getElementById("phoneNumber").value = "";
+      return;
+    }
+
+    const xhr = new XMLHttpRequest();
+    xhr.open("GET", "getCustomerInfo.php?customer_id=" + encodeURIComponent(customerId), true);
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState === 4 && xhr.status === 200) {
+        try {
+          const data = JSON.parse(xhr.responseText);
+          if (data.success) {
+            document.getElementById("customerName").value = data.name;
+            document.getElementById("phoneNumber").value = data.phone;
+          } else {
+            document.getElementById("customerName").value = "";
+            document.getElementById("phoneNumber").value = "";
+          }
+        } catch (e) {
+          console.error("JSON解析エラー:", e);
+        }
+      }
+    };
+    xhr.send();
+  }
+
 function submitForm() {
   const rows = document.querySelectorAll("tbody tr");
   const items = [];

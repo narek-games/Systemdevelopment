@@ -1,14 +1,22 @@
 <?php
-// GETパラメータから値を取得し、未定義・nullの場合は空文字で初期化
-$delivery_id = $_GET['delivery_id'] ?? '';
-$delivery_date_raw = $_GET['delivery_date'] ?? ''; // "YYYY-MM-DD HH:MM:SS" 形式で受け取る
-$customer_id = $_GET['customer_id'] ?? '';
-$customer_name = $_GET['customer_name'] ?? '';
+// =================================================================
+// ▼▼▼ PHPの処理（ここから） ▼▼▼
+// この部分は、主に画面が表示される前の準備をしています。
+// =================================================================
 
-// 受け取った日付文字列から日付部分（YYYY-MM-DD）だけを抽出
+// 前の画面（deliveryHome.php）から送られてきた情報を、変数という名前の箱に入れています。
+// ?? '' は、もし情報が何も送られてこなかった場合にエラーが出ないようにするためのお守りのようなものです。
+$delivery_id = $_GET['delivery_id'] ?? '';         // 納品ID
+$delivery_date_raw = $_GET['delivery_date'] ?? ''; // 日付（"2024-01-01" のような形で受け取ります）
+$customer_id = $_GET['customer_id'] ?? '';         // 顧客ID
+$customer_name = $_GET['customer_name'] ?? '';     // 顧客名
+
+// 受け取った日付データを、日付入力欄で正しく表示できるように準備します。
+// deliveryHome.phpから "YYYY-MM-DD" 形式で渡ってくるので、基本的にはそのまま使います。
 $delivery_date_for_input = '';
 if ($delivery_date_raw) {
-    // substr() を使って先頭10文字を切り出す
+    // もし "YYYY-MM-DD HH:MM:SS" のように時刻が含まれていた場合でも、
+    // substr() を使って先頭10文字だけを切り出すことで、日付入力欄に対応させます。
     $delivery_date_for_input = substr($delivery_date_raw, 0, 10);
 }
 ?>
@@ -18,6 +26,10 @@ if ($delivery_date_raw) {
   <meta charset="UTF-8">
   <title>納品書編集画面</title>
   <style>
+    /* ================================================================= */
+    /* ▼▼▼ CSS（画面の見た目を整える設定）▼▼▼ */
+    /* ここでは、文字の大きさ、色、配置などを決めています。 */
+    /* ================================================================= */
     body {
       font-family: "Hiragino Kaku Gothic ProN", sans-serif;
       margin: 0;
@@ -172,11 +184,16 @@ if ($delivery_date_raw) {
  
 <body>
  
- 
+  <!-- ================================================================= -->
+  <!-- ▼▼▼ HTML（画面の骨組み）▼▼▼ -->
+  <!-- ここでは、画面に表示される文字や入力欄などを配置しています。 -->
+  <!-- ================================================================= -->
+
   <div class="header">
     <div class="header-title">納品書編集画面</div>
     <div class="nav-links">
       <a href="./home.html">HOME</a>
+      <!-- 他のナビゲーションリンクが必要な場合はここに追加します -->
  
     </div>
   </div>
@@ -185,20 +202,24 @@ if ($delivery_date_raw) {
  
   <div class="grid">
     <div class="form-group">
-      <label>納品ID</label>
+      <label>納品ID</label> <!-- 「納品ID」という見出し -->
+      <!-- 納品IDを表示する入力欄。readonlyなので、ユーザーは編集できません。 -->
       <input type="text" class="readonly" value="<?= htmlspecialchars($delivery_id) ?>" readonly>
     </div>
     <div class="form-group">
-      <label>日付</label>
+      <label>日付</label> <!-- 「日付」という見出し -->
+      <!-- 日付を入力するための特別な入力欄。PHPで準備した日付が最初から入っています。 -->
       <input type="date" id="deliveryDate" value="<?= htmlspecialchars($delivery_date_for_input) ?>">
     </div>
  
     <div class="form-group">
-      <label>顧客ID</label>
+      <label>顧客ID</label> <!-- 「顧客ID」という見出し -->
+      <!-- 顧客IDを表示する入力欄。readonlyなので、ユーザーは編集できません。 -->
       <input type="text" class="readonly" value="<?= htmlspecialchars($customer_id) ?>" readonly>
     </div>
     <div class="form-group">
-      <label>顧客名</label>
+      <label>顧客名</label> <!-- 「顧客名」という見出し -->
+      <!-- 顧客名を表示する入力欄。readonlyなので、ユーザーは編集できません。 -->
       <input type="text" value="<?= htmlspecialchars($customer_name) ?>" readonly>
     </div>
   </div>
@@ -213,6 +234,7 @@ if ($delivery_date_raw) {
       </tr>
     </thead>
     <tbody>
+      <!-- この部分は現在、固定のサンプルデータが表示されています。将来的にはデータベースから取得した明細を表示します。 -->
       <tr>
         <td><a href="#">週刊BCN 10/17</a></td>
         <td><input type="number" value="1" class="qty" oninput="updateUnDelivered(this)" min="0"></td>
@@ -244,88 +266,115 @@ if ($delivery_date_raw) {
     <button onclick="location.href='orderOption.php'">商品を追加</button>
   </div>
  
+  <!-- 画面下部の操作ボタン -->
   <div class="button-group">
     <a href="./deliveryHome.php"><button class="back-button">戻る</button></a>
     <button class="save-button">保存</button>
   </div>
 
   <script>
-function updateUnDelivered(input) {
-  const tr = input.closest('tr');
-  const undelivered = tr.querySelector('.undelivered');
-  if (!undelivered.dataset.original) {
-    undelivered.dataset.original = undelivered.value;
-  }
-  let qty = parseInt(input.value) || 0;
-  if (qty < 0) qty = 0;
-  const original = parseInt(undelivered.dataset.original) || 0;
-  let result = original - qty;
-  if (result < 0) result = 0;
-  undelivered.value = result;
-  // max属性の更新
-  input.max = original;
-  if (qty > original) {
-    input.value = original;
-    undelivered.value = 0;
-  }
-}
-window.addEventListener('DOMContentLoaded', function() {
-  document.querySelectorAll('tr').forEach(tr => {
-    const qty = tr.querySelector('.qty');
-    const undelivered = tr.querySelector('.undelivered');
-    if (qty && undelivered) {
+    /* ================================================================= */
+    /* ▼▼▼ JavaScript（画面に動きをつけるプログラム）▼▼▼ */
+    /* ================================================================= */
+
+    /**
+     * 「数量」が変更されたときに、「未納品数量」を自動で計算し直すためのプログラムです。
+     * @param {object} input - 変更があった「数量」の入力欄そのもの
+     */
+    function updateUnDelivered(input) {
+      // １．変更があった行（tr）全体を取得します。
+      const tr = input.closest('tr');
+      // ２．その行にある「未納品数量」の入力欄を取得します。
+      const undelivered = tr.querySelector('.undelivered');
+
+      // ３．もし、元の未納品数量をまだ覚えていなければ、こっそり覚えておきます。
       if (!undelivered.dataset.original) {
         undelivered.dataset.original = undelivered.value;
       }
-      let qtyVal = parseInt(qty.value) || 0;
-      if (qtyVal < 0) qtyVal = 0;
-      const original = parseInt(undelivered.dataset.original) || 0;
-      let result = original - qtyVal;
-      if (result < 0) result = 0;
-      undelivered.value = result;
-      // max属性の初期設定
-      qty.max = original;
-      if (qtyVal > original) {
-        qty.value = original;
-        undelivered.value = 0;
-      }
-    }
-  });
-});
 
-// 保存ボタンでテーブル内容をlocalStorageに保存
-const saveBtn = document.querySelector('.save-button');
-if(saveBtn){
-  saveBtn.addEventListener('click', function(){
-    const rows = Array.from(document.querySelectorAll('tbody tr'));
-    const data = rows.map(tr => {
-      return {
-        product: tr.querySelector('td:nth-child(1) a')?.textContent || '',
-        qty: tr.querySelector('.qty')?.value || '',
-        undelivered: tr.querySelector('.undelivered')?.value || '',
-        price: tr.querySelector('td:nth-child(4)')?.textContent || ''
-      };
-    });
-    localStorage.setItem('deliveryUpdateData', JSON.stringify(data));
-    window.location.href = 'deliveryHome.html';
-  });
-}
-// ページ読み込み時にlocalStorageから復元
-window.addEventListener('DOMContentLoaded', function() {
-  const saved = localStorage.getItem('deliveryUpdateData');
-  if(saved){
-    const data = JSON.parse(saved);
-    const rows = Array.from(document.querySelectorAll('tbody tr'));
-    data.forEach((item, i) => {
-      if(rows[i]){
-        rows[i].querySelector('td:nth-child(1) a').textContent = item.product;
-        rows[i].querySelector('.qty').value = item.qty;
-        rows[i].querySelector('.undelivered').value = item.undelivered;
-        rows[i].querySelector('td:nth-child(4)').textContent = item.price;
+      // ４．入力された「数量」と、元々の「未納品数量」を取得します。
+      let qty = parseInt(input.value) || 0; // 入力された数量
+      const original = parseInt(undelivered.dataset.original) || 0; // 元の未納品数量
+
+      // ５．数量が元の数を超えないように、またマイナスにならないように調整します。
+      if (qty > original) {
+        qty = original;
+        input.value = original; // 入力欄の数字も正しい値に直す
+      }
+      if (qty < 0) {
+        qty = 0;
+        input.value = 0;
+      }
+
+      // ６．「元の未納品数量」から「数量」を引いて、新しい未納品数量を計算します。
+      let result = original - qty;
+
+      // ７．計算結果を「未納品数量」の入力欄に表示します。
+      undelivered.value = result;
+
+      // ８．入力できる数量の上限（max属性）を元の未納品数量に設定します。
+      input.max = original;
+    }
+
+    /**
+     * ページが読み込まれた時に、自動的に実行されるプログラムです。
+     * 主に、最初の表示を整えたり、イベント（クリックなど）の準備をしたりします。
+     */
+    window.addEventListener('DOMContentLoaded', function() {
+      // ページにある全ての行に対して、最初の「未納品数量」を計算する準備をします。
+      document.querySelectorAll('tbody tr').forEach(tr => {
+        const qtyInput = tr.querySelector('.qty');
+        if (qtyInput) {
+          // 最初の表示のために、一度計算処理を呼び出します。
+          updateUnDelivered(qtyInput);
+        }
+      });
+
+      // 「保存」ボタンがクリックされたときの処理を準備します。
+      const saveBtn = document.querySelector('.save-button');
+      if (saveBtn) {
+        saveBtn.addEventListener('click', function() {
+          // 現在はまだデータベースに保存する機能がないため、
+          // 入力内容をブラウザに一時的に記憶させて、一覧画面に戻る動きをします。
+          alert('保存処理は現在準備中です。\n入力内容は一時的にブラウザに記憶されます。');
+
+          // 表（tbody）の全ての行（tr）からデータを集めます。
+          const rows = Array.from(document.querySelectorAll('tbody tr'));
+          const dataToSave = rows.map(tr => {
+            return {
+              product: tr.querySelector('td:nth-child(1) a')?.textContent || '',
+              qty: tr.querySelector('.qty')?.value || '',
+              undelivered: tr.querySelector('.undelivered')?.value || '',
+              price: tr.querySelector('td:nth-child(4)')?.textContent || ''
+            };
+          });
+
+          // 集めたデータをブラウザの記憶領域（localStorage）に保存します。
+          localStorage.setItem('deliveryUpdateData', JSON.stringify(dataToSave));
+
+          // 納品一覧画面に戻ります。
+          window.location.href = 'deliveryHome.php';
+        });
+      }
+
+      // ページ読み込み時に、もしブラウザに一時保存したデータがあれば、それを復元します。
+      const savedData = localStorage.getItem('deliveryUpdateData');
+      if (savedData) {
+        const data = JSON.parse(savedData);
+        const rows = Array.from(document.querySelectorAll('tbody tr'));
+        // 保存されていたデータを、表の各行にセットしていきます。
+        data.forEach((item, index) => {
+          if (rows[index]) {
+            rows[index].querySelector('td:nth-child(1) a').textContent = item.product;
+            rows[index].querySelector('.qty').value = item.qty;
+            rows[index].querySelector('.undelivered').value = item.undelivered;
+            rows[index].querySelector('td:nth-child(4)').textContent = item.price;
+          }
+        });
+        // 一度使ったデータは消しておきます。
+        localStorage.removeItem('deliveryUpdateData');
       }
     });
-  }
-});
   </script>
  
 </body>

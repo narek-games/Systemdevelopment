@@ -144,7 +144,7 @@ try {
   <button class="btn-addRow" onclick="addRow()">+</button>
 </div>
 <p>
-  <button class="btn" onclick="location.href='orderHome.html'">戻る</button>
+  <button class="btn" onclick="location.href='orderHome.php'">戻る</button>
   <button class="btn" onclick="saveTableState()">保存</button>
 </p>
 <script>

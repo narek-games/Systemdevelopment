@@ -130,7 +130,8 @@ function getAllDeliveries($pdo) {
         SELECT 
             d.delivery_id,              -- 納品ID
             d.customer_id,              -- 顧客ID
-            DATE_FORMAT(d.delivery_date, '%Y年%m月%d日') AS formatted_date, -- 日付を和暦形式に
+            DATE(d.delivery_date) AS delivery_date, -- YYYY-MM-DD形式
+            IFNULL(DATE_FORMAT(d.delivery_date, '%Y年%m月%d日'), '') AS formatted_date, -- 表示用形式(NULLの場合は空文字)
             c.customer_name             -- 顧客名
         FROM delivery d
         INNER JOIN customer c ON d.customer_id = c.customer_id -- 顧客IDで結合

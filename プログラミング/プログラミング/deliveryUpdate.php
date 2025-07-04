@@ -1,3 +1,17 @@
+<?php
+// GETパラメータから値を取得し、未定義・nullの場合は空文字で初期化
+$delivery_id = $_GET['delivery_id'] ?? '';
+$delivery_date_raw = $_GET['delivery_date'] ?? ''; // "YYYY-MM-DD HH:MM:SS" 形式で受け取る
+$customer_id = $_GET['customer_id'] ?? '';
+$customer_name = $_GET['customer_name'] ?? '';
+
+// 受け取った日付文字列から日付部分（YYYY-MM-DD）だけを抽出
+$delivery_date_for_input = '';
+if ($delivery_date_raw) {
+    // substr() を使って先頭10文字を切り出す
+    $delivery_date_for_input = substr($delivery_date_raw, 0, 10);
+}
+?>
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -149,6 +163,10 @@
     .back-button:hover {
       background-color: gray;
     }
+
+    input[readonly], .undelivered[readonly] {
+      background-color: #e0e0e0 !important;
+    }
   </style>
 </head>
  
@@ -168,30 +186,20 @@
   <div class="grid">
     <div class="form-group">
       <label>納品ID</label>
-      <input type="text" class="readonly" value="DE000001" readonly>
+      <input type="text" class="readonly" value="<?= htmlspecialchars($delivery_id) ?>" readonly>
     </div>
     <div class="form-group">
       <label>日付</label>
-      <input type="date" id="deliveryDate">
+      <input type="date" id="deliveryDate" value="<?= htmlspecialchars($delivery_date_for_input) ?>">
     </div>
- 
-    <script>
-      window.addEventListener('DOMContentLoaded', () => {
-        const today = new Date();
-        const yyyy = today.getFullYear();
-        const mm = String(today.getMonth() + 1).padStart(2, '0');
-        const dd = String(today.getDate()).padStart(2, '0');
-        document.getElementById('deliveryDate').value = `${yyyy}-${mm}-${dd}`;
-      });
-    </script>
  
     <div class="form-group">
       <label>顧客ID</label>
-      <input type="text" class="readonly" value="CU000001" readonly>
+      <input type="text" class="readonly" value="<?= htmlspecialchars($customer_id) ?>" readonly>
     </div>
     <div class="form-group">
       <label>顧客名</label>
-      <input type="text" value="大阪情報専門学校">
+      <input type="text" value="<?= htmlspecialchars($customer_name) ?>" readonly>
     </div>
   </div>
  
@@ -233,11 +241,11 @@
   </table>
  
   <div class="add-product">
-    <button onclick="location.href='orderOption.html'">商品を追加</button>
+    <button onclick="location.href='orderOption.php'">商品を追加</button>
   </div>
  
   <div class="button-group">
-    <a href="./deliveryHome.html"><button class="back-button">戻る</button></a>
+    <a href="./deliveryHome.php"><button class="back-button">戻る</button></a>
     <button class="save-button">保存</button>
   </div>
 

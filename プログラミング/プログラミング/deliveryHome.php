@@ -148,21 +148,21 @@ $deliveries = getAllDeliveries($pdo);
             foreach ($deliveries as $delivery): ?>
               <tr>
                 <!-- htmlspecialcharsでXSS対策しつつ各項目を表示（納品ID、顧客ID、日付、顧客名） -->
-                <td><?= htmlspecialchars($delivery['delivery_id']) ?></td>
-                <td><?= htmlspecialchars($delivery['customer_id']) ?></td>
-                <td><?= htmlspecialchars($delivery['formatted_date']) ?></td>
-                <td><?= htmlspecialchars($delivery['customer_name']) ?></td>
-                <!-- 編集ボタン：該当納品データの編集画面へ遷移 -->
-                <td><a href="deliveryUpdate.php" class="edit-btn">編集</a></td>
+                <td><?= htmlspecialchars($delivery['delivery_id'] ?? '') ?></td>
+                <td><?= htmlspecialchars($delivery['customer_id'] ?? '') ?></td>
+                <td><?= htmlspecialchars($delivery['formatted_date'] ?? '') ?></td>
+                <td><?= htmlspecialchars($delivery['customer_name'] ?? '') ?></td>
+                <!-- 編集ボタン：該当納品データの編集画面へ遷移（GETパラメータで情報を渡す） -->
+                <td><a href="deliveryUpdate.php?delivery_id=<?= urlencode($delivery['delivery_id'] ?? '') ?>&amp;customer_id=<?= urlencode($delivery['customer_id'] ?? '') ?>&amp;delivery_date=<?= urlencode($delivery['delivery_date'] ?? '') ?>&amp;customer_name=<?= urlencode($delivery['customer_name'] ?? '') ?>" class="edit-btn">編集</a></td>
                 <!-- 削除ボタン：押下時に確認ダイアログを表示し、OKなら該当データをDBから削除 -->
                 <td>
                   <form method="post" action="" style="display:inline;" onsubmit="return confirm('本当に削除しますか？');">
-                    <input type="hidden" name="delete_id" value="<?= htmlspecialchars($delivery['delivery_id']) ?>">
+                    <input type="hidden" name="delete_id" value="<?= htmlspecialchars($delivery['delivery_id'] ?? '') ?>">
                     <button type="submit" class="delete-btn">削除</button>
                   </form>
                 </td>
                 <!-- 印刷ボタン：納品書印刷画面へ遷移（GETパラメータで情報を渡す） -->
-                <td><a href="deliveryPrint.php?delivery_id=<?= urlencode($delivery['delivery_id']) ?>&amp;customer_name=<?= urlencode($delivery['customer_name']) ?>&amp;delivery_date=<?= urlencode($delivery['formatted_date']) ?>" class="print-btn">印刷</a></td>
+                <td><a href="deliveryPrint.php?delivery_id=<?= urlencode($delivery['delivery_id'] ?? '') ?>&amp;customer_name=<?= urlencode($delivery['customer_name'] ?? '') ?>&amp;delivery_date=<?= urlencode($delivery['formatted_date'] ?? '') ?>" class="print-btn">印刷</a></td>
               </tr>
             <?php endforeach;
           else: // データが1件もない場合の表示 

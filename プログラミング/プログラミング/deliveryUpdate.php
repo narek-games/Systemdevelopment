@@ -1,4 +1,8 @@
 <?php
+// データベースに接続するためのファイルを読み込みます。
+require_once 'dbConnect.php';
+require_once 'dbConnectFunction.php';
+
 // =================================================================
 // ▼▼▼ PHPの処理（ここから） ▼▼▼
 // この部分は、主に画面が表示される前の準備をしています。
@@ -18,6 +22,39 @@ if ($delivery_date_raw) {
     // もし "YYYY-MM-DD HH:MM:SS" のように時刻が含まれていた場合でも、
     // substr() を使って先頭10文字だけを切り出すことで、日付入力欄に対応させます。
     $delivery_date_for_input = substr($delivery_date_raw, 0, 10);
+}
+
+// =================================================================
+// ▼▼▼ データベースから明細データを取得する処理 ▼▼▼
+// =================================================================
+$items = []; // 明細データを格納する配列を、まず空の箱として準備します。
+
+// 納品IDがちゃんと前の画面から渡されている場合のみ、データベースに問い合わせます。
+if (!empty($delivery_id)) {
+    // ２つのテーブル（delivery_detail と order_detail）を内部でつなぎ合わせて、
+    // 目的の納品IDに紐づく商品の詳細情報（品名、未納品数量、単価）を
+    // 一度にまとめて取得するためのSQL命令文です。
+    $sql = "
+        SELECT DISTINCT
+            od.product_name,          -- 品名
+            od.undelivered_quantity,  -- 未納品数量（これが納品できる最大数になります）
+            od.product_price          -- 単価
+        FROM
+            delivery_detail AS dd
+        INNER JOIN
+            order_detail AS od ON dd.order_product_number = od.order_product_number
+        WHERE
+            dd.delivery_id = :delivery_id
+    ";
+
+    // 安全にSQL命令を実行するための準備をします。
+    $stmt = $pdo->prepare($sql);
+
+    // SQL命令文の「:delivery_id」という目印に、実際の納品IDをセットして、実行します。
+    $stmt->execute([':delivery_id' => $delivery_id]);
+
+    // 実行結果（見つかった商品のリスト）をすべて取得して、配列 $items の箱に格納します。
+    $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 ?>
 <!DOCTYPE html>
@@ -234,31 +271,30 @@ if ($delivery_date_raw) {
       </tr>
     </thead>
     <tbody>
-      <!-- この部分は現在、固定のサンプルデータが表示されています。将来的にはデータベースから取得した明細を表示します。 -->
-      <tr>
-        <td><a href="#">週刊BCN 10/17</a></td>
-        <td><input type="number" value="1" class="qty" oninput="updateUnDelivered(this)" min="0"></td>
-        <td><input type="number" value="1" class="undelivered" readonly min="0"></td>
-        <td>363</td>
-      </tr>
-      <tr>
-        <td><a href="#">日経コンピュータ 11月号</a></td>
-        <td><input type="number" value="1" class="qty" oninput="updateUnDelivered(this)" min="0"></td>
-        <td><input type="number" value="1" class="undelivered" readonly min="0"></td>
-        <td>1,300</td>
-      </tr>
-      <tr>
-        <td><a href="#">SoftwareDesign 11月号</a></td>
-        <td><input type="number" value="1" class="qty" oninput="updateUnDelivered(this)" min="0"></td>
-        <td><input type="number" value="1" class="undelivered" readonly min="0"></td>
-        <td>1,342</td>
-      </tr>
-      <tr>
-        <td><a href="#">医療情報 第7版 医学・医療編</a></td>
-        <td><input type="number" value="11" class="qty" oninput="updateUnDelivered(this)" min="0"></td>
-        <td><input type="number" value="11" class="undelivered" readonly min="0"></td>
-        <td>3,740</td>
-      </tr>
+      <!-- ここからPHPのプログラムで、データベースから取得した商品の数だけ表の行を繰り返し作ります -->
+      <?php if (!empty($items)): // もし商品データが1件以上見つかったら ?>
+        <?php foreach ($items as $item): // 商品データを1件ずつ取り出して、行（<tr>）を作ります ?>
+          <tr>
+            <!-- 品名：データベースから取得した品名を表示します -->
+            <td><a href="#"><?= htmlspecialchars($item['product_name']) ?></a></td>
+            
+            <!-- 数量：ユーザーが今回納品する数量を入力する欄。初期値として納品可能な最大数を表示します -->
+            <td><input type="number" value="<?= htmlspecialchars($item['undelivered_quantity']) ?>" class="qty" oninput="updateUnDelivered(this)" min="0"></td>
+            
+            <!-- 未納品数量：上記の数量を納品した場合の、残りの未納品数量が自動で計算されます。ここは直接編集できません -->
+            <td><input type="number" value="<?= htmlspecialchars($item['undelivered_quantity']) ?>" class="undelivered" readonly min="0"></td>
+            
+            <!-- 単価：データベースから取得した単価を、読みやすいように3桁区切りのカンマ付きで表示します -->
+            <td><?= htmlspecialchars(number_format($item['product_price'])) ?></td>
+          </tr>
+        <?php endforeach; ?>
+      <?php else: // もし商品データが1件も見つからなかったら ?>
+        <tr>
+          <!-- 「明細がありません」というメッセージを4つの列を結合して表示します -->
+          <td colspan="4">表示できる明細がありません。</td>
+        </tr>
+      <?php endif; ?>
+      <!-- PHPの繰り返し処理はここまでです -->
     </tbody>
   </table>
  

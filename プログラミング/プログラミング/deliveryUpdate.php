@@ -278,10 +278,10 @@ if (!empty($delivery_id)) {
             <!-- 品名：データベースから取得した品名を表示します -->
             <td><a href="#"><?= htmlspecialchars($item['product_name']) ?></a></td>
             
-            <!-- 数量：ユーザーが今回納品する数量を入力する欄。初期値として納品可能な最大数を表示します -->
-            <td><input type="number" value="<?= htmlspecialchars($item['undelivered_quantity']) ?>" class="qty" oninput="updateUnDelivered(this)" min="0"></td>
+            <!-- 数量：ユーザーが今回納品する数量を入力する欄。初期値は0にします -->
+            <td><input type="number" value="0" class="qty" oninput="updateUnDelivered(this)" min="0"></td>
             
-            <!-- 未納品数量：上記の数量を納品した場合の、残りの未納品数量が自動で計算されます。ここは直接編集できません -->
+            <!-- 未納品数量：DB上の値をそのまま表示。ここは直接編集できません -->
             <td><input type="number" value="<?= htmlspecialchars($item['undelivered_quantity']) ?>" class="undelivered" readonly min="0"></td>
             
             <!-- 単価：データベースから取得した単価を、読みやすいように3桁区切りのカンマ付きで表示します -->
@@ -357,12 +357,20 @@ if (!empty($delivery_id)) {
      * 主に、最初の表示を整えたり、イベント（クリックなど）の準備をしたりします。
      */
     window.addEventListener('DOMContentLoaded', function() {
-      // ページにある全ての行に対して、最初の「未納品数量」を計算する準備をします。
+      // ページにある全ての行に対して、数量欄が空欄または0なら未納品数量はDB値のまま表示
       document.querySelectorAll('tbody tr').forEach(tr => {
         const qtyInput = tr.querySelector('.qty');
-        if (qtyInput) {
-          // 最初の表示のために、一度計算処理を呼び出します。
-          updateUnDelivered(qtyInput);
+        const undelivered = tr.querySelector('.undelivered');
+        if (qtyInput && undelivered) {
+          // 元の未納品数量を覚えておく
+          if (!undelivered.dataset.original) {
+            undelivered.dataset.original = undelivered.value;
+          }
+          // 数量が空欄や0なら未納品数量は変更しない
+          let qtyVal = parseInt(qtyInput.value);
+          if (!isNaN(qtyVal) && qtyVal > 0) {
+            updateUnDelivered(qtyInput);
+          }
         }
       });
 

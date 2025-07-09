@@ -3,6 +3,27 @@
 require_once 'dbConnect.php';
 require_once 'dbConnectFunction.php';
 
+// データベースに接続するためのファイルを読み込みます。
+require_once 'dbConnect.php';
+require_once 'dbConnectFunction.php';
+
+// =================================================================
+// ▼▼▼ 保存ボタン押下時のDB更新処理 ▼▼▼
+// =================================================================
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delivery_id'], $_POST['delivery_date'])) {
+    $update_id = $_POST['delivery_id'];
+    $update_date = $_POST['delivery_date'];
+    // SQLで納品日を更新
+    $sql = "UPDATE delivery SET delivery_date = :delivery_date WHERE delivery_id = :delivery_id";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([
+        ':delivery_date' => $update_date,
+        ':delivery_id' => $update_id
+    ]);
+    // 更新後、納品一覧画面に遷移
+    header("Location: deliveryHome.php");
+    exit;
+}
 // =================================================================
 // ▼▼▼ PHPの処理（ここから） ▼▼▼
 // この部分は、主に画面が表示される前の準備をしています。
@@ -237,29 +258,26 @@ if (!empty($delivery_id)) {
  
  
  
-  <div class="grid">
-    <div class="form-group">
-      <label>納品ID</label> <!-- 「納品ID」という見出し -->
-      <!-- 納品IDを表示する入力欄。readonlyなので、ユーザーは編集できません。 -->
-      <input type="text" class="readonly" value="<?= htmlspecialchars($delivery_id) ?>" readonly>
+  <form method="post">
+    <div class="grid">
+      <div class="form-group">
+        <label>納品ID</label>
+        <input type="text" class="readonly" value="<?= htmlspecialchars($delivery_id) ?>" readonly>
+        <input type="hidden" name="delivery_id" value="<?= htmlspecialchars($delivery_id) ?>">
+      </div>
+      <div class="form-group">
+        <label>日付</label>
+        <input type="date" id="deliveryDate" name="delivery_date" value="<?= htmlspecialchars($delivery_date_for_input) ?>">
+      </div>
+      <div class="form-group">
+        <label>顧客ID</label>
+        <input type="text" class="readonly" value="<?= htmlspecialchars($customer_id) ?>" readonly>
+      </div>
+      <div class="form-group">
+        <label>顧客名</label>
+        <input type="text" value="<?= htmlspecialchars($customer_name) ?>" readonly>
+      </div>
     </div>
-    <div class="form-group">
-      <label>日付</label> <!-- 「日付」という見出し -->
-      <!-- 日付を入力するための特別な入力欄。PHPで準備した日付が最初から入っています。 -->
-      <input type="date" id="deliveryDate" value="<?= htmlspecialchars($delivery_date_for_input) ?>">
-    </div>
- 
-    <div class="form-group">
-      <label>顧客ID</label> <!-- 「顧客ID」という見出し -->
-      <!-- 顧客IDを表示する入力欄。readonlyなので、ユーザーは編集できません。 -->
-      <input type="text" class="readonly" value="<?= htmlspecialchars($customer_id) ?>" readonly>
-    </div>
-    <div class="form-group">
-      <label>顧客名</label> <!-- 「顧客名」という見出し -->
-      <!-- 顧客名を表示する入力欄。readonlyなので、ユーザーは編集できません。 -->
-      <input type="text" value="<?= htmlspecialchars($customer_name) ?>" readonly>
-    </div>
-  </div>
  
   <table>
     <thead>
@@ -303,10 +321,11 @@ if (!empty($delivery_id)) {
   </div>
  
   <!-- 画面下部の操作ボタン -->
-  <div class="button-group">
-    <a href="./deliveryHome.php"><button class="back-button">戻る</button></a>
-    <button class="save-button">保存</button>
-  </div>
+    <div class="button-group">
+      <a href="./deliveryHome.php"><button type="button" class="back-button">戻る</button></a>
+      <button type="submit" class="save-button">保存</button>
+    </div>
+  </form>
 
   <script>
     /* ================================================================= */
@@ -374,32 +393,7 @@ if (!empty($delivery_id)) {
         }
       });
 
-      // 「保存」ボタンがクリックされたときの処理を準備します。
-      const saveBtn = document.querySelector('.save-button');
-      if (saveBtn) {
-        saveBtn.addEventListener('click', function() {
-          // 現在はまだデータベースに保存する機能がないため、
-          // 入力内容をブラウザに一時的に記憶させて、一覧画面に戻る動きをします。
-          alert('保存処理は現在準備中です。\n入力内容は一時的にブラウザに記憶されます。');
-
-          // 表（tbody）の全ての行（tr）からデータを集めます。
-          const rows = Array.from(document.querySelectorAll('tbody tr'));
-          const dataToSave = rows.map(tr => {
-            return {
-              product: tr.querySelector('td:nth-child(1) a')?.textContent || '',
-              qty: tr.querySelector('.qty')?.value || '',
-              undelivered: tr.querySelector('.undelivered')?.value || '',
-              price: tr.querySelector('td:nth-child(4)')?.textContent || ''
-            };
-          });
-
-          // 集めたデータをブラウザの記憶領域（localStorage）に保存します。
-          localStorage.setItem('deliveryUpdateData', JSON.stringify(dataToSave));
-
-          // 納品一覧画面に戻ります。
-          window.location.href = 'deliveryHome.php';
-        });
-      }
+      // 保存ボタンのJS処理は不要になりました（サーバーサイドでDB更新するため）
 
       // ページ読み込み時に、もしブラウザに一時保存したデータがあれば、それを復元します。
       const savedData = localStorage.getItem('deliveryUpdateData');

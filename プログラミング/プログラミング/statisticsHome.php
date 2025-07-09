@@ -141,7 +141,7 @@
  
   <div class="button-container">
     <a href="./home.html"><button class="back-button">戻る</button></a>
-    <a href="./customerUpload.html"><button class="back-button">アップロード</button></a>
+    <a href="./customerUpload.php"><button class="back-button">アップロード</button></a>
   </div>
  
 </body>

@@ -173,4 +173,47 @@ function deleteDeliveryById($pdo, $delivery_id) {
         return false;
     }
 }
+
+/**
+ * 納品明細データを取得する関数
+ * @param PDO $pdo
+ * @param string|int $delivery_id
+ * @return array
+ */
+function getDeliveryItems($pdo, $delivery_id) {
+    $sql = "SELECT DISTINCT od.product_name, od.undelivered_quantity, od.product_price, od.product_quantity, od.order_product_number FROM delivery_detail AS dd INNER JOIN order_detail AS od ON dd.order_product_number = od.order_product_number WHERE dd.delivery_id = :delivery_id";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([':delivery_id' => $delivery_id]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+/**
+ * 納品明細の分納・数量更新処理
+ * @param PDO $pdo
+ * @param array $post POSTデータ
+ */
+function updateDeliveryDetails($pdo, $post) {
+    if (!empty($post['order_product_number'])) {
+        $count = count($post['order_product_number']);
+        for ($i = 0; $i < $count; $i++) {
+            $order_product_number = $post['order_product_number'][$i];
+            $product_name = isset($post['product_name'][$i]) ? $post['product_name'][$i] : null;
+            $delivery_qty = intval($post['product_quantity'][$i]);
+            $original_qty = isset($post['original_product_quantity'][$i]) ? intval($post['original_product_quantity'][$i]) : null;
+            $original_undelivered = isset($post['original_undelivered_quantity'][$i]) ? intval($post['original_undelivered_quantity'][$i]) : null;
+            if ($original_qty !== null && $original_undelivered !== null && $product_name !== null && $delivery_qty > 0 && $delivery_qty <= $original_undelivered) {
+                $new_delivered = $original_qty + $delivery_qty;
+                $new_undelivered = $original_undelivered - $delivery_qty;
+                $sql2 = "UPDATE order_detail SET product_quantity = :product_quantity, undelivered_quantity = :undelivered_quantity WHERE order_product_number = :order_product_number AND product_name = :product_name";
+                $stmt2 = $pdo->prepare($sql2);
+                $stmt2->execute([
+                    ':product_quantity' => $new_delivered,
+                    ':undelivered_quantity' => $new_undelivered,
+                    ':order_product_number' => $order_product_number,
+                    ':product_name' => $product_name
+                ]);
+            }
+        }
+    }
+}
 ?>

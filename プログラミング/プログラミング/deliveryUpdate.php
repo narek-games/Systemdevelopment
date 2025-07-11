@@ -8,40 +8,8 @@ require_once 'dbConnectFunction.php';
 // 納品書編集：保存処理
 // =============================
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delivery_id'], $_POST['delivery_date'])) {
-  // 納品日を更新
-  $sql = "UPDATE delivery SET delivery_date = :delivery_date WHERE delivery_id = :delivery_id";
-  $stmt = $pdo->prepare($sql);
-  $stmt->execute([
-    ':delivery_date' => $_POST['delivery_date'],
-    ':delivery_id' => $_POST['delivery_id']
-  ]);
-  // 商品ごとの分納処理
-  if (!empty($_POST['order_product_number'])) {
-    $count = count($_POST['order_product_number']);
-    for ($i = 0; $i < $count; $i++) {
-      // 各明細ごとにパラメータ取得
-      $order_product_number = $_POST['order_product_number'][$i];
-      $product_name = isset($_POST['product_name'][$i]) ? $_POST['product_name'][$i] : null;
-      $delivery_qty = intval($_POST['product_quantity'][$i]); // 今回納品量
-      $original_qty = isset($_POST['original_product_quantity'][$i]) ? intval($_POST['original_product_quantity'][$i]) : null; // DB上の納品済み累計
-      $original_undelivered = isset($_POST['original_undelivered_quantity'][$i]) ? intval($_POST['original_undelivered_quantity'][$i]) : null; // DB上の未納品
-      // 入力値チェック＆分納処理
-      if ($original_qty !== null && $original_undelivered !== null && $product_name !== null && $delivery_qty > 0 && $delivery_qty <= $original_undelivered) {
-        // 納品済み累計・未納品数量を計算
-        $new_delivered = $original_qty + $delivery_qty;
-        $new_undelivered = $original_undelivered - $delivery_qty;
-        // DB更新（order_product_number, product_nameで特定）
-        $sql2 = "UPDATE order_detail SET product_quantity = :product_quantity, undelivered_quantity = :undelivered_quantity WHERE order_product_number = :order_product_number AND product_name = :product_name";
-        $stmt2 = $pdo->prepare($sql2);
-        $stmt2->execute([
-          ':product_quantity' => $new_delivered,
-          ':undelivered_quantity' => $new_undelivered,
-          ':order_product_number' => $order_product_number,
-          ':product_name' => $product_name
-        ]);
-      }
-    }
-  }
+  // DB更新処理を関数でまとめて実行
+  updateDeliveryDetails($pdo, $_POST);
   // 保存後は一覧画面へリダイレクト
   header("Location: deliveryHome.php");
   exit;

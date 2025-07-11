@@ -4,7 +4,7 @@ require_once 'dbConnect.php';
 $sql = "
     SELECT 
         o.order_id,
-        c.customer_id,
+        o.customer_id,
         c.customer_name,
         o.order_date,
         o.order_state
@@ -19,6 +19,7 @@ $stmt = $pdo->query($sql);
 
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <title>注文書管理画面</title>
@@ -44,31 +45,20 @@ $stmt = $pdo->query($sql);
             margin-bottom: 20px;
         }
 
-        .table-wrapper {
+        table {
             width: 90%;
             margin: auto;
-            max-height: 400px;
-            overflow-y: auto;
-            overflow-x: hidden;
-            border: 1px solid #ccc;
-        }
-
-        table {
-            width: 100%;
             border-collapse: collapse;
         }
 
-        th, td {
+        th,
+        td {
             border: 1px solid #888;
             padding: 8px;
-            text-align: center;
         }
 
         th {
             background-color: #f0f0f0;
-            position: sticky;
-            top: 0;
-            z-index: 1;
         }
 
         .status-pending {
@@ -93,6 +83,16 @@ $stmt = $pdo->query($sql);
             font-weight: bold;
         }
 
+        .edit-link.disabled {
+            color: #ccc;
+            pointer-events: none;
+        }
+
+        .delete-link.disabled {
+            color: #f99;
+            pointer-events: none;
+        }
+
         .btn-container {
             margin-top: 30px;
             display: flex;
@@ -111,22 +111,46 @@ $stmt = $pdo->query($sql);
             box-shadow: 2px 2px 3px #888;
             color: black;
             cursor: pointer;
+            margin: 0;
         }
 
         .btn:hover {
             background-color: #a5c6ed;
         }
+
+        .search-button {
+            font-size: 20px;
+            padding: 10px 20px;
+            border: none;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .search-button:hover {
+            background-color: #45a049;
+        }
+
+        .table-wrapper {
+            width: 90%;
+            margin: auto;
+            max-height: 500px;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
     </style>
 </head>
+
 <body>
     <h2>注文書管理画面</h2>
 
     <div class="search-container">
-        <input type="text" id="searchBox" placeholder="顧客ID・顧客名・注文IDで検索">
+        <input type="text" id="searchInput" placeholder="顧客名または注文ID">
+        <button class="search-button">🔍 検索</button>
     </div>
-
     <div class="table-wrapper">
-        <table>
+        <table id="orderTable">
             <thead>
                 <tr>
                     <th>注文ID</th>
@@ -141,11 +165,7 @@ $stmt = $pdo->query($sql);
             <tbody>
                 <?php if ($stmt->rowCount() > 0): ?>
                     <?php while ($row = $stmt->fetch(PDO::FETCH_ASSOC)): ?>
-                        <tr 
-                            data-order-id="<?= htmlspecialchars($row['order_id']) ?>" 
-                            data-customer-id="<?= htmlspecialchars($row['customer_id']) ?>"
-                            data-customer-name="<?= htmlspecialchars($row['customer_name']) ?>"
-                        >
+                        <tr>
                             <td><?= htmlspecialchars($row['order_id']) ?></td>
                             <td><?= htmlspecialchars($row['customer_id']) ?></td>
                             <td><?= htmlspecialchars($row['customer_name']) ?></td>
@@ -153,12 +173,18 @@ $stmt = $pdo->query($sql);
                             <td class="<?= $row['order_state'] ? 'status-complete' : 'status-pending' ?>">
                                 <?= $row['order_state'] ? '納品済' : '未納品' ?>
                             </td>
-                            <td><a class="edit-link" href="orderUpdate.html">編集</a></td>
-                            <td><a class="delete-link" href="orderDelete.php">削除</a></td>
+                            <td>
+                                <a class="edit-link" href="orderUpdate.php?order_id=<?= urlencode($row['order_id']) ?>">編集</a>
+                            </td>
+                            <td>
+                                <a class="delete-link" href="orderDelete.php?order_id=<?= urlencode($row['order_id']) ?>">削除</a>
+                            </td>
                         </tr>
                     <?php endwhile; ?>
                 <?php else: ?>
-                    <tr><td colspan="7">注文データが存在しません。</td></tr>
+                    <tr>
+                        <td colspan="7">注文データが存在しません。</td>
+                    </tr>
                 <?php endif; ?>
             </tbody>
         </table>
@@ -176,29 +202,22 @@ $stmt = $pdo->query($sql);
                 alert("注文書が作成されました");
             }
 
-            const searchBox = document.getElementById("searchBox");
-            const rows = document.querySelectorAll("tbody tr[data-order-id]");
-
-            searchBox.addEventListener("input", function () {
-                const keyword = searchBox.value.toLowerCase();
+            const input = document.getElementById("searchInput");
+            input.addEventListener("input", function () {
+                const keyword = input.value.trim().toLowerCase();
+                const rows = document.querySelectorAll("#orderTable tbody tr");
 
                 rows.forEach(row => {
-                    const orderId = row.dataset.orderId.toLowerCase();
-                    const customerId = row.dataset.customerId.toLowerCase();
-                    const customerName = row.dataset.customerName.toLowerCase();
+                    const cells = row.querySelectorAll("td");
+                    const orderId = cells[0]?.textContent?.toLowerCase() || "";
+                    const customerName = cells[2]?.textContent?.toLowerCase() || "";
 
-                    if (
-                        orderId.includes(keyword) ||
-                        customerId.includes(keyword) ||
-                        customerName.includes(keyword)
-                    ) {
-                        row.style.display = "";
-                    } else {
-                        row.style.display = "none";
-                    }
+                    const match = orderId.includes(keyword) || customerName.includes(keyword);
+                    row.style.display = match ? "" : "none";
                 });
             });
         });
     </script>
 </body>
+
 </html>

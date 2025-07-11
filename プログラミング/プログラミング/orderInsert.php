@@ -110,7 +110,7 @@
 </div>
 
 <div class="button-container">
-  <a href="./orderHome.html"><button class="back-button">戻る</button></a>
+  <a href="./orderHome.php"><button class="back-button">戻る</button></a>
   <button onclick="submitForm()" class="Add-button">作成</button>
 </div>
 

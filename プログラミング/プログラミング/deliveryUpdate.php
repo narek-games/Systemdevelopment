@@ -267,7 +267,7 @@ if (!empty($delivery_id)) {
       </table>
 
       <div class="add-product">
-        <button onclick="location.href='orderOption.php'">商品を追加</button>
+        <button onclick="location.href='orderOption.php'">商品を追加</button><!--クリックすると何故かdeliveryHome.phpに飛ばされる(7/11現在)-->
       </div>
 
       <!-- 画面下部の操作ボタン -->

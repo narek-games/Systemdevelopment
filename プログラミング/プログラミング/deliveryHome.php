@@ -1,17 +1,23 @@
 <?php
-// データベース接続用ファイルを読み込む
+// =============================
+// データベース接続・関数読み込み
+// =============================
 require_once 'dbConnect.php';
-require_once 'dbConnectFunction.php'; // ← 追加：DB操作関数を利用
+require_once 'dbConnectFunction.php'; // DB操作関数を利用
 
-// --- 削除処理 ---
-// 削除ボタンが押され、POSTでdelete_idが送信された場合に該当レコードをDBから削除
+// =============================
+// 削除処理
+// =============================
+// 削除ボタンが押された場合、該当レコードをDBから削除
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
   $delete_id = $_POST['delete_id'];
   // 共通関数で削除処理
   deleteDeliveryById($pdo, $delete_id);
 }
 
-// --- 納品データの取得 ---
+// =============================
+// 納品データの取得
+// =============================
 // 共通関数で納品データ一覧を取得
 $deliveries = getAllDeliveries($pdo);
 ?>
@@ -23,12 +29,16 @@ $deliveries = getAllDeliveries($pdo);
   <meta charset="UTF-8">
   <title>納品書管理画面</title>
   <style>
+    /* =============================
+       画面全体のスタイル
+    ============================= */
     body {
       font-family: "Hiragino Kaku Gothic ProN", sans-serif;
       background: #f4f4f4;
       background-color: white;
     }
 
+    /* ヘッダー部分 */
     header h1 {
       margin: 0;
       font-size: 20px;
@@ -47,10 +57,12 @@ $deliveries = getAllDeliveries($pdo);
       border-radius: 16px;
     }
 
+    /* テーブル部分 */
     table {
       width: 100%;
       border-collapse: collapse;
       margin-bottom: 15px;
+      table-layout: fixed;
     }
 
     th,
@@ -58,12 +70,17 @@ $deliveries = getAllDeliveries($pdo);
       border: 1px solid #999;
       padding: 8px;
       text-align: center;
+      word-break: break-all;
     }
 
     th {
       background-color: #e0e0e0;
+      position: sticky;
+      top: 0;
+      z-index: 2;
     }
 
+    /* ボタン・操作部分 */
     .btn-container {
       display: flex;
       justify-content: center;
@@ -123,12 +140,19 @@ $deliveries = getAllDeliveries($pdo);
 
 <body>
 
+  <!-- =============================
+       ヘッダー
+  ============================= -->
   <header>
     <h1>納品書管理画面</h1>
   </header>
 
   <main>
-    <div style="max-height: 500px; overflow-y: auto;">
+    <!-- =============================
+         納品データ一覧テーブル
+         列名は固定、データのみスクロール
+    ============================= -->
+    <div style="max-height: 500px; overflow-y: auto; width: 100%;">
       <table style="min-width: 900px;">
         <thead>
           <tr>
@@ -176,7 +200,9 @@ $deliveries = getAllDeliveries($pdo);
       </table>
     </div>
 
-    <!-- 下部の操作ボタン -->
+    <!-- =============================
+         下部の操作ボタン
+    ============================= -->
     <div class="btn-container">
       <a href="home.html"><button class="reset-btn">戻る</button></a>
       <a href="deliveryInsert.php"><button class="submit-btn">新規納品書作成</button></a>

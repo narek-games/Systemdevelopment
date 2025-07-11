@@ -333,7 +333,7 @@ if (is_numeric($customer_deadline_excel) && $customer_deadline_excel > 0) {
       </div>
 
       <div>
-        <a href="./statisticsHome.html"><button type="button" class="button-back">戻る</button></a>
+        <a href="./statisticsHome.php"><button type="button" class="button-back">戻る</button></a>
         <button type="button" class="button-upload" onclick="uploadFile()">アップロード</button>
       </div>
     </form>

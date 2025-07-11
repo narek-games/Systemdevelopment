@@ -25,17 +25,6 @@
       font-weight: bold;
     }
  
-    .nav-links a {
-      color: white;
-      text-decoration: none;
-      margin-left: 30px;
-      font-size: 16px;
-    }
- 
-    .nav-links a:hover {
-      text-decoration: underline;
-    }
- 
     h1 {
       font-size: 24px;
       margin: 40px;
@@ -92,11 +81,7 @@
       cursor: pointer;
       box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
     }
-
-    .button:hover {
-      background-color: blue;
-    }
-
+ 
     .back-button:hover {
       background-color: blue;
     }
@@ -107,10 +92,11 @@
     <div class="header-title">統計情報確認画面</div>
   </div>
  
- 
-  <div style="margin-left: 40px;">
-    <input type="text" placeholder="顧客名または顧客ID">
-    <button class="search">🔍</button>
+  <div style="margin-left: 40px; margin-top: 20px;">
+    <form method="get" action="">
+      <input type="text" name="keyword" placeholder="顧客名または顧客ID" value="<?= htmlspecialchars($_GET['keyword'] ?? '') ?>">
+      <button class="search">🔍</button>
+    </form>
   </div>
  
   <table>
@@ -123,26 +109,28 @@
       </tr>
     </thead>
     <tbody>
-     <?php
-            include 'dbConnectFunction.php';
-            $stmt = getStatistics();
-
-            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                echo "<tr>
-                    <td><a href='#'>{$row['customer_id']}</a></td>
-                    <td><a href='#'>{$row['customer_name']}</a></td>
-                    <td>{$row['customer_sales']}</td>
-                    <td>{$row['customer_average_leadtime']}</td>
-                </tr>";
-            }
-        ?>
+      <?php
+        include 'dbConnectFunction.php';
+ 
+        $keyword = $_GET['keyword'] ?? '';
+        $stmt = getStatistics($keyword);
+ 
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            echo "<tr>
+                <td><a href='#'>{$row['customer_id']}</a></td>
+                <td><a href='#'>{$row['customer_name']}</a></td>
+                <td>{$row['customer_sales']}</td>
+                <td>{$row['customer_average_leadtime']}</td>
+              </tr>";
+        }
+      ?>
     </tbody>
   </table>
  
   <div class="button-container">
     <a href="./home.html"><button class="back-button">戻る</button></a>
-    <a href="./customerUpload.html"><button class="back-button">アップロード</button></a>
+    <a href="./customerUpload.php"><button class="back-button">アップロード</button></a>
   </div>
- 
 </body>
 </html>
+ 

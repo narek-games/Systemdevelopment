@@ -1,35 +1,50 @@
 <?php
-
-function getStatistics()
+function getStatistics($keyword = '')
 {
     $host = '10.15.153.12';
     $dbname = 'mbs';
     $username = 'user';
     $password = '1212';
-
-    try{
+ 
+    try {
         $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-        $statisticsStmt = $pdo->query("SELECT customer_id, customer_name, customer_sales, ROUND(customer_leadtime / customer_delivery_count, 1) AS customer_average_leadtime FROM customer");
-
+ 
+        // 検索キーワードがある場合は WHERE 句を追加
+        if (!empty($keyword)) {
+            $sql = "SELECT customer_id, customer_name, customer_sales,
+                           ROUND(customer_leadtime / customer_delivery_count, 1) AS customer_average_leadtime
+                    FROM customer
+                    WHERE customer_id LIKE :keyword OR customer_name LIKE :keyword
+                    ORDER BY customer_id";
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindValue(':keyword', '%' . $keyword . '%', PDO::PARAM_STR);
+            $stmt->execute();
+        } else {
+            $stmt = $pdo->query("SELECT customer_id, customer_name, customer_sales,
+                                        ROUND(customer_leadtime / customer_delivery_count, 1) AS customer_average_leadtime
+                                 FROM customer
+                                 ORDER BY customer_id");
+        }
+ 
+        return $stmt;
+ 
     } catch (PDOException $e) {
         echo "接続エラー: " . $e->getMessage();
+        exit; // エラー時は明示的に終了
     }
-
-    return $statisticsStmt;
 }
-
+ 
 function checkDB(){
     $host = '10.15.153.12';
     $dbname = 'mbs';
     $username = 'user';
     $password = '1212';
-    
+   
     try {
         $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        
+       
         echo "<h2>顧客</h2>";
         $stmt = $pdo->query("SELECT * FROM customer");
         echo "<table border='1'>
@@ -50,7 +65,7 @@ function checkDB(){
             </tr>";
         }
         echo "</table><br>";
-    
+   
         echo "<h2>納品書管理テーブル</h2>";
         $stmt = $pdo->query("SELECT * FROM delivery");
         echo "<table border='1'>
@@ -64,7 +79,7 @@ function checkDB(){
             </tr>";
         }
         echo "</table><br>";
-    
+   
         echo "<h2>納品明細</h2>";
         $stmt = $pdo->query("SELECT * FROM delivery_detail");
         echo "<table border='1'>
@@ -78,21 +93,22 @@ function checkDB(){
             </tr>";
         }
         echo "</table><br>";
-    
+   
         echo "<h2>注文書管理</h2>";
         $stmt = $pdo->query("SELECT * FROM `order`");
         echo "<table border='1'>
-            <tr><th>注文ID</th><th>顧客ID</th><th>作成日</th><th>状態</th></tr>";
+            <tr><th>注文ID</th><th>顧客ID</th><th>作成日</th><th>納品日</th><th>状態</th></tr>";
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             echo "<tr>
                 <td>{$row['order_id']}</td>
                 <td>{$row['customer_id']}</td>
                 <td>{$row['order_date']}</td>
+                <td>{$row['order_delivered_date']}</td>
                 <td>{$row['order_state']}</td>
             </tr>";
         }
         echo "</table><br>";
-    
+   
         echo "<h2>注文明細</h2>";
         $stmt = $pdo->query("SELECT * FROM order_detail");
         echo "<table border='1'>
@@ -110,7 +126,7 @@ function checkDB(){
             </tr>";
         }
         echo "</table>";
-    
+   
     } catch (PDOException $e) {
         echo "接続エラー: " . $e->getMessage();
     }
@@ -119,7 +135,7 @@ function checkDB(){
 // =============================
 // 納品データ取得・削除用関数
 // =============================
-
+ 
 /**
  * 納品データ一覧を取得する関数
  * @param PDO $pdo DB接続済みPDOインスタンス
@@ -127,7 +143,7 @@ function checkDB(){
  */
 function getAllDeliveries($pdo) {
     $sql = "
-        SELECT 
+        SELECT
             d.delivery_id,              -- 納品ID
             d.customer_id,              -- 顧客ID
             DATE(d.delivery_date) AS delivery_date, -- YYYY-MM-DD形式
@@ -140,7 +156,7 @@ function getAllDeliveries($pdo) {
     $stmt = $pdo->query($sql);
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
-
+ 
 /**
  * 指定した納品IDのレコードを削除する関数
  * @param PDO $pdo DB接続済みPDOインスタンス

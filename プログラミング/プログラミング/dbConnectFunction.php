@@ -1,17 +1,17 @@
 <?php
 // dbConnectFunction.php
- 
+
 function getStatistics($keyword = '')
 {
     $host = '10.15.153.12';
     $dbname = 'mbs';
     $username = 'user';
     $password = '1212';
- 
+
     try {
         $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
- 
+
         // SQLクエリでCOALESCE関数を使用し、NULLを空の文字列に変換
         // ROUND関数による計算結果もNULLになる可能性があるため、COALESCEで囲みます
         $base_sql = "SELECT
@@ -20,12 +20,12 @@ function getStatistics($keyword = '')
                             COALESCE(customer_sales, '') AS customer_sales,
                             COALESCE(ROUND(customer_leadtime / NULLIF(customer_delivery_count, 0), 1), '') AS customer_average_leadtime
                         FROM customer";
- 
+
         // NULLIF(customer_delivery_count, 0) は、customer_delivery_count が 0 の場合に NULL を返します。
         // これにより「0による除算」を避けることができます。
         // その結果が NULL になる場合も考慮して、外側の COALESCE で '' に変換します。
- 
- 
+
+
         // 検索キーワードがある場合は WHERE 句を追加
         if (!empty($keyword)) {
             $sql = $base_sql . " WHERE customer_id LIKE :keyword OR customer_name LIKE :keyword ORDER BY customer_id";
@@ -36,9 +36,8 @@ function getStatistics($keyword = '')
             $sql = $base_sql . " ORDER BY customer_id";
             $stmt = $pdo->query($sql);
         }
- 
+
         return $stmt;
- 
     } catch (PDOException $e) {
         // エラーをログに記録するか、よりユーザーフレンドリーなメッセージを表示することを検討
         error_log("データベース接続エラーまたはクエリ実行エラー: " . $e->getMessage());
@@ -47,19 +46,20 @@ function getStatistics($keyword = '')
         exit; // エラー時は明示的に終了
     }
 }
- 
+
 // checkDB関数やgetAllDeliveries関数、deleteDeliveryById関数は変更なし
 // ただし、checkDB関数内でも表示されるNULLをなくしたい場合は、同様にCOALESCE関数を適用してください
-function checkDB(){
+function checkDB()
+{
     $host = '10.15.153.12';
     $dbname = 'mbs';
     $username = 'user';
     $password = '1212';
- 
+
     try {
         $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
- 
+
         echo "<h2>顧客</h2>";
         // COALESCE を適用
         $stmt = $pdo->query("SELECT
@@ -93,11 +93,11 @@ function checkDB(){
             </tr>";
         }
         echo "</table><br>";
- 
+
         // 他のテーブル (delivery, delivery_detail, order, order_detail) も同様に
         // COALESCE を適用したいカラムがあれば追加してください。
         // 例えば、delivery_detail の product_abstract など。
- 
+
         echo "<h2>納品書管理テーブル</h2>";
         $stmt = $pdo->query("SELECT delivery_id, delivery_date, customer_id, COALESCE(tax_rate, '') AS tax_rate FROM delivery");
         echo "<table border='1'>
@@ -111,7 +111,7 @@ function checkDB(){
             </tr>";
         }
         echo "</table><br>";
- 
+
         echo "<h2>納品明細</h2>";
         $stmt = $pdo->query("SELECT delivery_product_number, delivery_id, order_product_number, order_id FROM delivery_detail");
         echo "<table border='1'>
@@ -125,7 +125,7 @@ function checkDB(){
             </tr>";
         }
         echo "</table><br>";
- 
+
         echo "<h2>注文書管理</h2>";
         $stmt = $pdo->query("SELECT order_id, customer_id, order_date, order_delivered_date, COALESCE(order_state, '') AS order_state FROM `order`");
         echo "<table border='1'>
@@ -140,7 +140,7 @@ function checkDB(){
             </tr>";
         }
         echo "</table><br>";
- 
+
         echo "<h2>注文明細</h2>";
         $stmt = $pdo->query("SELECT
                                 order_product_number,
@@ -167,19 +167,19 @@ function checkDB(){
             </tr>";
         }
         echo "</table>";
- 
     } catch (PDOException $e) {
         error_log("データベース接続エラー: " . $e->getMessage());
         echo "データベースエラーが発生しました。システム管理者にお問い合わせください。";
     }
 }
- 
+
 /**
  * 納品データ一覧を取得する関数
  * @param PDO $pdo DB接続済みPDOインスタンス
  * @return array 納品データ配列
  */
-function getAllDeliveries($pdo) {
+function getAllDeliveries($pdo)
+{
     $sql = "
         SELECT
             d.delivery_id,             -- 納品ID
@@ -194,14 +194,15 @@ function getAllDeliveries($pdo) {
     $stmt = $pdo->query($sql);
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
- 
+
 /**
  * 指定した納品IDのレコードを削除する関数
  * @param PDO $pdo DB接続済みPDOインスタンス
  * @param string|int $delivery_id 削除対象の納品ID
  * @return bool 成功時true、失敗時false
  */
-function deleteDeliveryById($pdo, $delivery_id) {
+function deleteDeliveryById($pdo, $delivery_id)
+{
     try {
         $stmt = $pdo->prepare('DELETE FROM delivery WHERE delivery_id = ?');
         return $stmt->execute([$delivery_id]);
@@ -212,5 +213,33 @@ function deleteDeliveryById($pdo, $delivery_id) {
         return false;
     }
 }
-?>
- 
+/**
+ * 納品明細の分納・数量更新処理
+ * @param PDO $pdo
+ * @param array $post POSTデータ
+ */
+function updateDeliveryDetails($pdo, $post)
+{
+    if (!empty($post['order_product_number'])) {
+        $count = count($post['order_product_number']);
+        for ($i = 0; $i < $count; $i++) {
+            $order_product_number = $post['order_product_number'][$i];
+            $product_name = isset($post['product_name'][$i]) ? $post['product_name'][$i] : null;
+            $delivery_qty = intval($post['product_quantity'][$i]);
+            $original_qty = isset($post['original_product_quantity'][$i]) ? intval($post['original_product_quantity'][$i]) : null;
+            $original_undelivered = isset($post['original_undelivered_quantity'][$i]) ? intval($post['original_undelivered_quantity'][$i]) : null;
+            if ($original_qty !== null && $original_undelivered !== null && $product_name !== null && $delivery_qty > 0 && $delivery_qty <= $original_undelivered) {
+                $new_delivered = $original_qty + $delivery_qty;
+                $new_undelivered = $original_undelivered - $delivery_qty;
+                $sql2 = "UPDATE order_detail SET product_quantity = :product_quantity, undelivered_quantity = :undelivered_quantity WHERE order_product_number = :order_product_number AND product_name = :product_name";
+                $stmt2 = $pdo->prepare($sql2);
+                $stmt2->execute([
+                    ':product_quantity' => $new_delivered,
+                    ':undelivered_quantity' => $new_undelivered,
+                    ':order_product_number' => $order_product_number,
+                    ':product_name' => $product_name
+                ]);
+            }
+        }
+    }
+}

@@ -9,7 +9,7 @@ require_once 'dbConnectFunction.php';
 // =============================
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delivery_id'], $_POST['delivery_date'])) {
   // DB更新処理を関数でまとめて実行
-  updateDeliveryDetails($pdo, $_POST);//←誰か消した！？
+  updateDeliveryDetails($pdo, $_POST);
   // 保存後は一覧画面へリダイレクト
   header("Location: deliveryHome.php");
   exit;

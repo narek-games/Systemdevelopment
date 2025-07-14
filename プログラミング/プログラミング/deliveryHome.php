@@ -205,7 +205,7 @@ $deliveries = getAllDeliveries($pdo);
     ============================= -->
     <div class="btn-container">
       <a href="home.html"><button class="reset-btn">戻る</button></a>
-      <a href="deliveryInsert.php"><button class="submit-btn">新規納品書作成</button></a>
+      <a href="orderOption.php"><button class="submit-btn">新規納品書作成</button></a>
     </div>
   </main>
 

@@ -11,9 +11,8 @@ if (!$orderId) {
     exit;
 }
 
-// 修正: 正しいカラム名(order_product_number, product_price)でデータを取得
 $sql = "
-    SELECT order_product_number, product_name, product_price 
+    SELECT order_id, order_product_number, product_name, product_price, undelivered_quantity 
     FROM order_detail
     WHERE order_id = ?
 ";

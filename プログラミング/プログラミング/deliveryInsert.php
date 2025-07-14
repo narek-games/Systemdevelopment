@@ -2,18 +2,22 @@
 $customer_id = $_POST['customer_id'] ?? '';
 $customer_name = $_POST['customer_name'] ?? '';
 
+$order_ids = $_POST['order_ids'] ?? [];
 $order_product_numbers = $_POST['order_product_numbers'] ?? [];
 $product_names = $_POST['product_names'] ?? [];
 $product_prices = $_POST['product_prices'] ?? [];
+$undelivered_quantities = $_POST['undelivered_quantities'] ?? [];
 
 $items = [];
 if (!empty($order_product_numbers)) {
     foreach ($order_product_numbers as $index => $opn) {
         $items[] = [
+            'order_id'             => $order_ids[$index] ?? '',
             'order_product_number' => $opn,
-            'name'     => $product_names[$index] ?? '名称不明',
-            'price'    => $product_prices[$index] ?? 0,
-            'quantity' => 1
+            'name'                 => $product_names[$index] ?? '名称不明',
+            'price'                => $product_prices[$index] ?? 0,
+            'quantity'             => 1, // 初期表示の数量
+            'undelivered'          => $undelivered_quantities[$index] ?? 0
         ];
     }
 }
@@ -49,7 +53,7 @@ if (!empty($order_product_numbers)) {
         <?php if (empty($items)): ?>
             <p style="color:red; border:1px solid red; padding:15px; border-radius:8px;">商品が選択されていません。前のページに戻って商品を選択してください。</p>
             <div class="buttons">
-                <a href="order_select.php" class="button reset-btn">戻る</a>
+                <a href="orderOption.php" class="button reset-btn">戻る</a>
             </div>
         <?php else: ?>
             <form id="deliveryForm" action="save_delivery.php" method="post">
@@ -74,20 +78,27 @@ if (!empty($order_product_numbers)) {
 
                 <table id="itemTable">
                     <thead>
-                        <tr>
-                            <th>品名</th>
-                            <th>数量</th>
-                            <th>単価</th>
-                            <th>金額</th>
-                        </tr>
+                        <tr><th>品名</th><th>数量</th><th>単価</th><th>金額</th></tr>
                     </thead>
                     <tbody>
                         <?php foreach ($items as $index => $item): ?>
                             <tr class="item-row">
+                                <input type="hidden" name="items[<?= $index ?>][order_id]" value="<?= htmlspecialchars($item['order_id']) ?>">
                                 <input type="hidden" name="items[<?= $index ?>][order_product_number]" value="<?= htmlspecialchars($item['order_product_number']) ?>">
+                                <input type="hidden" name="items[<?= $index ?>][price]" value="<?= htmlspecialchars($item['price']) ?>">
+                                
                                 <td><input type="text" name="items[<?= $index ?>][name]" value="<?= htmlspecialchars($item['name']) ?>" class="readonly" readonly></td>
-                                <td><input type="number" name="items[<?= $index ?>][quantity]" value="<?= htmlspecialchars($item['quantity']) ?>" min="1" class="qty" oninput="updateRow(this)" required></td>
-                                <td><input type="number" name="items[<?= $index ?>][price]" value="<?= htmlspecialchars($item['price']) ?>" class="price readonly" readonly></td>
+                                <td>
+                                    <input type="number" 
+                                           name="items[<?= $index ?>][quantity]" 
+                                           value="<?= htmlspecialchars($item['quantity']) ?>" 
+                                           min="1" 
+                                           max="<?= htmlspecialchars($item['undelivered']) ?>" 
+                                           class="qty" 
+                                           oninput="validateQuantity(this)" 
+                                           required>
+                                </td>
+                                <td><input type="number" value="<?= htmlspecialchars($item['price']) ?>" class="price readonly" readonly></td>
                                 <td><input type="number" class="total" value="<?= htmlspecialchars($item['quantity'] * $item['price']) ?>" readonly></td>
                             </tr>
                         <?php endforeach; ?>
@@ -112,7 +123,7 @@ if (!empty($order_product_numbers)) {
 
     function updateRow(input) {
         const row = input.closest('.item-row');
-        const qty = parseFloat(row.querySelector('.qty').value) || 0;
+        const qty = parseFloat(input.value) || 0;
         const price = parseFloat(row.querySelector('.price').value) || 0;
         const taxOption = document.querySelector('input[name="tax_option"]:checked').value;
         let total = qty * price;
@@ -122,11 +133,24 @@ if (!empty($order_product_numbers)) {
         row.querySelector('.total').value = Math.round(total);
     }
 
+    function validateQuantity(input) {
+        const max = parseInt(input.max, 10);
+        const value = parseInt(input.value, 10);
+
+        if (value > max) {
+            alert(`数量は未納品数量（${max}）を超えることはできません。`);
+            input.value = max;
+        }
+        if (value < 0) {
+            input.value = 1;
+        }
+        updateRow(input);
+    }
+
     function updateAll() {
-        document.querySelectorAll('.item-row').forEach(row => {
-            const qtyInput = row.querySelector('.qty');
-            if (qtyInput && qtyInput.value) {
-                updateRow(qtyInput);
+        document.querySelectorAll('.qty').forEach(input => {
+            if (input.value) {
+                updateRow(input);
             }
         });
     }

@@ -67,47 +67,47 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["excel"])) {
                         $phone_number_val = $worksheet->getCell('F' . $row)->getValue();
                         $delivery_index_val = $worksheet->getCell('G' . $row)->getValue();
                         $customer_notes_val = $worksheet->getCell('H' . $row)->getValue();
-                        $registration_date_excel = $worksheet->getCell('I' . $row)->getValue();
-
-
-
+                        
                         // registration_dateの処理
-// registration_dateの処理
-$registration_date_cell = $worksheet->getCell('I' . $row);
-$registration_date_excel = $registration_date_cell->getValue();
-$registration_date_formatted = null;
+                        $registration_date_cell = $worksheet->getCell('I' . $row);
+                        $registration_date_excel = $registration_date_cell->getValue();
+                        $registration_date_formatted = null;
 
-// Excel日付値が数値であり、かつ日付として有効な範囲内かを確認
-if (is_numeric($registration_date_excel) && $registration_date_excel > 0) { // Excel日付は1900年1月1日を1とする数値、負の値は無効
-    try {
-        $registration_date_obj = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($registration_date_excel);
-        $registration_date_formatted = $registration_date_obj->format('Y-m-d');
-    } catch (\PhpOffice\PhpSpreadsheet\Exception $e) {
-        // Excel日付の変換に失敗した場合（例: 無効な日付値）
-        error_log("Invalid Excel Date for registration_date at row " . $row . ": " . $registration_date_excel . " - " . $e->getMessage());
-        $registration_date_formatted = null; // または適切なデフォルト値
-    }
-}
+                        // Excel日付値が数値であり、かつ日付として有効な範囲内かを確認
+                        if (is_numeric($registration_date_excel) && $registration_date_excel > 0) { // Excel日付は1900年1月1日を1とする数値、負の値は無効
+                            try {
+                                $registration_date_obj = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($registration_date_excel);
+                                $registration_date_formatted = $registration_date_obj->format('Y-m-d');
+                            } catch (\PhpOffice\PhpSpreadsheet\Exception $e) {
+                                // Excel日付の変換に失敗した場合（例: 無効な日付値）
+                                error_log("Invalid Excel Date for registration_date at row " . $row . ": " . $registration_date_excel . " - " . $e->getMessage());
+                                $registration_date_formatted = null; // または適切なデフォルト値
+                            }
+                        }
+
+                        // customer_salesの処理 (J列)
+                        $customer_sales_val = $worksheet->getCell('J' . $row)->getValue();
+                        // customer_leadtimeの処理 (K列)
+                        $customer_leadtime_cell = $worksheet->getCell('K' . $row);
+                        $customer_leadtime_excel = $customer_leadtime_cell->getValue(); // ここでExcel日付として値を取得
+
+                        $customer_leadtime_formatted = null;
+
+                        // Excel日付値が数値であり、かつ日付として有効な範囲内かを確認
+                        if (is_numeric($customer_leadtime_excel) && $customer_leadtime_excel > 0) {
+                            try {
+                                $customer_leadtime_obj = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($customer_leadtime_excel);
+                                $customer_leadtime_formatted = $customer_leadtime_obj->format('Y-m-d'); // Y-m-d形式にフォーマット
+                            } catch (\PhpOffice\PhpSpreadsheet\Exception $e) {
+                                error_log("Invalid Excel Date for customer_leadtime at row " . $row . ": " . $customer_leadtime_excel . " - " . $e->getMessage());
+                                $customer_leadtime_formatted = null;
+                            }
+                        }
 
 
-// customer_deadlineの処理
-$customer_deadline_cell = $worksheet->getCell('J' . $row);
-$customer_deadline_excel = $customer_deadline_cell->getValue();
-$customer_deadline_formatted = null;
-
-// Excel日付値が数値であり、かつ日付として有効な範囲内かを確認
-if (is_numeric($customer_deadline_excel) && $customer_deadline_excel > 0) {
-    try {
-        $customer_deadline_obj = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($customer_deadline_excel);
-        $customer_deadline_formatted = $customer_deadline_obj->format('Y-m-d');
-    } catch (\PhpOffice\PhpSpreadsheet\Exception $e) {
-        // Excel日付の変換に失敗した場合
-        error_log("Invalid Excel Date for customer_deadline at row " . $row . ": " . $customer_deadline_excel . " - " . $e->getMessage());
-        $customer_deadline_formatted = null; // または適切なデフォルト値
-    }
-}
-
-                        $param_types = "isssssssisi";
+                        // customer_delivery_countの処理 (L列)
+                        $customer_delivery_count_val = $worksheet->getCell('L' . $row)->getValue();
+                        $param_types = "isssssssisi"; // customer_id, name, person, address, phone, delivery_notes, customer_notes, registration_date, sales, leadtime, delivery_count
                         $stmt->bind_param(
                             $param_types,
                             $customer_id_val,
@@ -117,10 +117,10 @@ if (is_numeric($customer_deadline_excel) && $customer_deadline_excel > 0) {
                             $phone_number_val,
                             $delivery_index_val,
                             $customer_notes_val,
-                            $registration_date_formatted,
-                            $customer_sales_val,
-                            $customer_deadline_formatted,
-                            $customer_delivery_count_val
+                            $registration_date_formatted, // フォーマット済み日付
+                            $customer_sales_val,          // customer_sales (J列の値)
+                            $customer_leadtime_formatted, // フォーマット済み日付 (K列の値)
+                            $customer_delivery_count_val  // customer_delivery_count (L列の値)
                         );
 
                         if ($stmt->execute()) {
@@ -259,50 +259,67 @@ if (is_numeric($customer_deadline_excel) && $customer_deadline_excel > 0) {
       text-align: left;
     }
 
-    .button {
-      padding: 10px 20px;
+    /* === ボタンデザインの修正箇所 === */
+    .button,
+    .button-back,
+    .button-upload {
+      padding: 12px 25px; /* 上下左右のパディングを調整 */
       border: none;
-      border-radius: 5px;
+      border-radius: 8px; /* 角丸を少し大きく */
       cursor: pointer;
-      font-size: 1em;
-      transition: background-color 0.3s ease;
-      color: white; /* Default text color for buttons */
+      font-size: 1.1em; /* フォントサイズを少し大きく */
+      font-weight: bold; /* フォントを太く */
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+      color: white; /* デフォルトの文字色 */
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 軽い影を追加 */
     }
 
     .button-back {
-      background-color: #6c757d; /* Grey color for "Back" */
-      color: white;
-      margin-right: 10px;
+      background-color: #f0f0f0; /* グレー系の背景色 */
+      color: #333; /* 文字色を濃いグレーに */
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 少し控えめな影 */
     }
 
     .button-back:hover {
-      background-color: #5a6268;
+      background-color: #e0e0e0; /* ホバー時の色 */
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
     }
 
+    .button, /* 「参照」ボタン */
     .button-upload {
-      background-color: #007bff; /* Blue color for "Upload" */
+      background-color: #4CAF50; /* 緑系の背景色 */
+      background-color: #6495ED; /* 画像の青色 */
       color: white;
     }
 
+    .button:hover,
     .button-upload:hover {
-      background-color: #0056b3;
+      background-color: #4169E1; /* ホバー時の濃い青色 */
+      box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
     }
 
-    /* Reference button style */
+    /* 「参照」ボタンの個別調整 */
     .file-select .button {
-        background-color: #007bff; /* Blue color from the image */
+        padding: 12px 25px; /* 参照ボタンも同様のパディング */
+        border-radius: 8px;
+        font-size: 1.1em;
+        font-weight: bold;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        background-color: #6495ED; 
+        color: white;
     }
-
     .file-select .button:hover {
-        background-color: #0056b3;
+        background-color: #4169E1; 
+        box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
     }
 
-    /* Menu icon and navigation - placeholder, adjust as needed */
+
+    
     .menu-icon {
-      display: none; /* Hidden for this specific layout, but good to keep */
+      display: none; 
     }
     nav#menu {
-      display: none; /* Hidden for this specific layout */
+      display: none; 
     }
   </style>
 </head>
@@ -390,13 +407,11 @@ if (is_numeric($customer_deadline_excel) && $customer_deadline_excel > 0) {
       })
       .then(response => {
         if (!response.ok) {
-          // Attempt to read error message from server response
           return response.text().then(text => { throw new Error(text) });
         }
         return response.text();
       })
       .then(result => {
-        // Replace the entire body content with the new HTML, which includes the message
         document.body.innerHTML = result;
       })
       .catch(error => {

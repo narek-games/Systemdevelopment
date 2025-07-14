@@ -161,8 +161,8 @@ if ($is_ajax_request) {
         } else {
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                 echo "<tr>
-                        <td><a href=\"#\">{$row['customer_id']}</a></td>
-                        <td><a href=\"#\">{$row['customer_name']}</a></td>
+                        <td>{$row['customer_id']}</td>
+                        <td>{$row['customer_name']}</td>
                         <td>{$row['customer_sales']}</td>
                         <td>{$row['customer_average_leadtime']}</td>
                       </tr>";
@@ -206,8 +206,8 @@ if ($is_ajax_request) {
             data.forEach(row => {
               const tr = document.createElement('tr');
               tr.innerHTML = `
-                <td><a href="#">${row.customer_id}</a></td>
-                <td><a href="#">${row.customer_name}</a></td>
+                <td>${row.customer_id}</td>
+                <td>${row.customer_name}</td>
                 <td>${row.customer_sales}</td>
                 <td>${row.customer_average_leadtime}</td>
               `;

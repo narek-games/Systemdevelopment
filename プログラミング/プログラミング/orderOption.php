@@ -1,19 +1,27 @@
 <?php
 require_once 'dbConnect.php';
 
+// 1. パラメータの受け取り
 $orderId = $_GET['order-id'] ?? '';
 $orderDate = $_GET['order-date'] ?? '';
 $customerId = $_GET['customer-id'] ?? '';
 $customerName = $_GET['customer-name'] ?? '';
+$sortable_columns = ['order_id', 'customer_name', 'order_date'];
+$sort_column = $_GET['sort'] ?? 'order_date';
+$sort_direction = $_GET['dir'] ?? 'DESC';
 
-// LEFT JOINとGROUP BYを使って、各注文の未納品数量の合計(total_undelivered)を取得
+// パラメータの検証
+if (!in_array($sort_column, $sortable_columns)) {
+    $sort_column = 'order_date';
+}
+if (!in_array(strtoupper($sort_direction), ['ASC', 'DESC'])) {
+    $sort_direction = 'DESC';
+}
+
+// 2. SQLの組み立て
 $sql = "
     SELECT 
-        o.order_id, 
-        o.customer_id, 
-        c.customer_name, 
-        o.order_date, 
-        o.order_state,
+        o.order_id, o.customer_id, c.customer_name, o.order_date, o.order_state,
         COALESCE(SUM(od.undelivered_quantity), 0) AS total_undelivered
     FROM `order` o
     JOIN customer c ON o.customer_id = c.customer_id
@@ -22,37 +30,30 @@ $sql = "
 ";
 $params = [];
 
-if ($orderId !== '') {
-    $sql .= " AND o.order_id = ?";
-    $params[] = $orderId;
-}
-if ($orderDate !== '') {
-    $sql .= " AND DATE(o.order_date) = ?";
-    try {
-        $formattedDate = new DateTime($orderDate);
-        $params[] = $formattedDate->format('Y-m-d');
-    } catch (Exception $e) {
-        $params[] = '0000-00-00';
-    }
-}
-if ($customerId !== '') {
-    $sql .= " AND o.customer_id = ?";
-    $params[] = $customerId;
-}
-if ($customerName !== '') {
-    $sql .= " AND c.customer_name LIKE ?";
-    $params[] = "%$customerName%";
-}
+if ($orderId !== '') { $sql .= " AND o.order_id = ?"; $params[] = $orderId; }
+if ($orderDate !== '') { $sql .= " AND DATE(o.order_date) = ?"; try { $d = new DateTime($orderDate); $params[] = $d->format('Y-m-d'); } catch (Exception $e) { $params[] = '0000-00-00'; } }
+if ($customerId !== '') { $sql .= " AND o.customer_id = ?"; $params[] = $customerId; }
+if ($customerName !== '') { $sql .= " AND c.customer_name LIKE ?"; $params[] = "%$customerName%"; }
 
 $sql .= " GROUP BY o.order_id, o.customer_id, c.customer_name, o.order_date, o.order_state";
-$sql .= " ORDER BY o.order_date DESC";
+$sql .= " ORDER BY " . $sort_column . " " . $sort_direction;
 
+// 3. DB実行と結果の取得
 $errorMsg = '';
+$results = [];
 try {
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
+    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     $errorMsg = $e->getMessage();
+}
+
+// 4. AJAXリクエストの場合、JSONを返して終了
+if (isset($_GET['json']) && $_GET['json'] == '1') {
+    header('Content-Type: application/json');
+    echo json_encode($results);
+    exit;
 }
 ?>
 <!DOCTYPE html>
@@ -68,6 +69,10 @@ try {
         .search-box .input-group { margin-right: 15px; }
         table { border-collapse: collapse; width: 100%; margin-bottom: 30px; }
         th, td { border: 1px solid #aaa; padding: 8px; text-align: center; }
+        th[data-sort] { cursor: pointer; user-select: none; }
+        th[data-sort]:hover { background-color: #f0f0f0; }
+        .sort-asc::after { content: ' ▲'; font-size: 0.8em; }
+        .sort-desc::after { content: ' ▼'; font-size: 0.8em; }
         .order-link { color: blue; text-decoration: underline; cursor: pointer; }
         .order-id-completed { color: #999; text-decoration: line-through; }
         .button { padding: 10px 15px; font-size: 14px; border-radius: 8px; cursor: pointer; border: 1px solid #ccc; }
@@ -88,24 +93,12 @@ try {
     <h1>注文書選択</h1>
     <form class="search-box" method="get" id="searchForm">
         <div class="search-row">
-            <div class="input-group">
-                <label for="order-id">注文ID</label>
-                <input type="text" id="order-id" name="order-id" value="<?= htmlspecialchars($orderId) ?>">
-            </div>
-            <div class="input-group">
-                <label for="order-date">注文日</label>
-                <input type="date" id="order-date" name="order-date" value="<?= htmlspecialchars($orderDate) ?>">
-            </div>
+            <div class="input-group"><label for="order-id">注文ID</label><input type="text" id="order-id" name="order-id" value="<?= htmlspecialchars($orderId) ?>"></div>
+            <div class="input-group"><label for="order-date">注文日</label><input type="date" id="order-date" name="order-date" value="<?= htmlspecialchars($orderDate) ?>"></div>
         </div>
         <div class="search-row">
-            <div class="input-group">
-                <label for="customer-id">顧客ID</label>
-                <input type="text" id="customer-id" name="customer-id" value="<?= htmlspecialchars($customerId) ?>">
-            </div>
-            <div class="input-group">
-                <label for="customer-name">顧客名</label>
-                <input type="text" id="customer-name" name="customer-name" value="<?= htmlspecialchars($customerName) ?>">
-            </div>
+            <div class="input-group"><label for="customer-id">顧客ID</label><input type="text" id="customer-id" name="customer-id" value="<?= htmlspecialchars($customerId) ?>"></div>
+            <div class="input-group"><label for="customer-name">顧客名</label><input type="text" id="customer-name" name="customer-name" value="<?= htmlspecialchars($customerName) ?>"></div>
             <button class="button search-button" type="submit">検索</button>
         </div>
     </form>
@@ -116,44 +109,28 @@ try {
     
     <table>
         <thead>
-            <tr><th>注文ID</th><th>顧客ID</th><th>顧客名</th><th>注文日</th><th>状態</th></tr>
-        </thead>
-        <tbody>
-            <?php while ($row = $stmt->fetch(PDO::FETCH_ASSOC)): ?>
             <tr>
-                <td>
-                    <?php if ($row['total_undelivered'] > 0): ?>
-                        <a class="order-link" 
-                           data-order-id="<?= htmlspecialchars($row['order_id']) ?>"
-                           data-customer-id="<?= htmlspecialchars($row['customer_id']) ?>"
-                           data-customer-name="<?= htmlspecialchars($row['customer_name']) ?>">
-                           <?= htmlspecialchars($row['order_id']) ?>
-                        </a>
-                    <?php else: ?>
-                        <span class="order-id-completed"><?= htmlspecialchars($row['order_id']) ?></span>
-                    <?php endif; ?>
-                </td>
-                <td><?= htmlspecialchars($row['customer_id']) ?></td>
-                <td><?= htmlspecialchars($row['customer_name']) ?></td>
-                <td><?= htmlspecialchars($row['order_date']) ?></td>
-                <td><?= $row['order_state'] ? '納品済' : '未納品' ?></td>
+                <th data-sort="order_id">注文ID</th>
+                <th>顧客ID</th>
+                <th data-sort="customer_name">顧客名</th>
+                <th data-sort="order_date" data-dir="DESC" class="sort-desc">注文日</th>
+                <th>状態</th>
             </tr>
-            <?php endwhile; ?>
-        </tbody>
+        </thead>
+        <tbody id="order-table-body">
+            </tbody>
     </table>
 
     <div id="product-popup" class="popup-overlay">
         <div class="popup-content">
             <h2 id="popup-title">商品選択</h2>
             <div id="popup-product-list"></div>
-            <div style="text-align:right; margin-top:15px;">
-                <button id="close-popup-btn" class="button back_button">閉じる</button>
-            </div>
+            <div style="text-align:right; margin-top:15px;"><button id="close-popup-btn" class="button back_button">閉じる</button></div>
         </div>
     </div>
 
     <form id="create-delivery-form" action="deliveryInsert.php" method="post">
-        <button class="button back_button" type="button" onclick="location.href='deliveryHome.php'">戻る</button>
+        <button class="button back_button" type="button" onclick="location.href='deliveryHome.html'">戻る</button>
         <button class="button create_button" id="createBtn" type="submit" disabled>作成</button>
     </form>
 
@@ -161,195 +138,170 @@ try {
 document.addEventListener('DOMContentLoaded', () => {
     let selectedCustomerId = null;
     let selectedCustomerName = null;
-    
-    const orderLinks = document.querySelectorAll('.order-link');
-    const popup = document.getElementById('product-popup');
-    const popupTitle = document.getElementById('popup-title');
-    const productListDiv = document.getElementById('popup-product-list');
-    const closePopupBtn = document.getElementById('close-popup-btn');
-    const createBtn = document.getElementById('createBtn');
-    const createForm = document.getElementById('create-delivery-form');
-    
     const selectedProducts = new Map();
 
-    orderLinks.forEach(link => {
-        link.addEventListener('click', async (e) => {
-            e.preventDefault();
-            const targetLink = e.currentTarget;
-            const orderId = targetLink.dataset.orderId;
-            
-            // ★★★ ここから修正 ★★★
-            // 顧客チェックのロジックをここからは削除
-            // ★★★ ここまで修正 ★★★
-
-            try {
-                const response = await fetch(`get_order_details.php?order-id=${orderId}`);
-                if (!response.ok) throw new Error('サーバーからの応答が正常ではありません。');
-                const products = await response.json(); 
-                
-                // ★★★ ここから修正 ★★★
-                // populateProductListに顧客情報も渡す
-                const customerId = targetLink.dataset.customerId;
-                const customerName = targetLink.dataset.customerName;
-                populateProductList(products, customerId, customerName);
-                // ★★★ ここまで修正 ★★★
-
-                popupTitle.textContent = `商品選択 (注文ID: ${orderId})`;
-                popup.style.display = 'flex';
-            } catch (error) {
-                console.error('商品データの取得に失敗しました:', error);
-                alert('商品データの取得に失敗しました。');
-            }
-        });
-    });
+    const orderTableBody = document.getElementById('order-table-body');
+    const sortableHeaders = document.querySelectorAll('th[data-sort]');
+    const createForm = document.getElementById('create-delivery-form');
+    const createBtn = document.getElementById('createBtn');
     
-    closePopupBtn.addEventListener('click', () => { popup.style.display = 'none'; });
-    popup.addEventListener('click', (e) => { if (e.target === popup) { popup.style.display = 'none'; } });
+    const initialOrders = <?= json_encode($results) ?>;
+    
+    // --- メイン関数 ---
 
-    createForm.addEventListener('submit', (e) => {
-        const existingInputs = createForm.querySelectorAll('input[type="hidden"]');
-        existingInputs.forEach(input => input.remove());
-
-        if (selectedCustomerId) {
-            const customerIdInput = document.createElement('input');
-            customerIdInput.type = 'hidden';
-            customerIdInput.name = 'customer_id';
-            customerIdInput.value = selectedCustomerId;
-            createForm.appendChild(customerIdInput);
-
-            const customerNameInput = document.createElement('input');
-            customerNameInput.type = 'hidden';
-            customerNameInput.name = 'customer_name';
-            customerNameInput.value = selectedCustomerName;
-            createForm.appendChild(customerNameInput);
-        }
-
-        selectedProducts.forEach((productData, uniqueKey) => {
-            const undeliveredInput = document.createElement('input');
-            undeliveredInput.type = 'hidden';
-            undeliveredInput.name = 'undelivered_quantities[]';
-            undeliveredInput.value = productData.undelivered;
-            createForm.appendChild(undeliveredInput);
-            
-            const orderIdInput = document.createElement('input');
-            orderIdInput.type = 'hidden';
-            orderIdInput.name = 'order_ids[]';
-            orderIdInput.value = productData.orderId;
-            createForm.appendChild(orderIdInput);
-
-            const opnInput = document.createElement('input');
-            opnInput.type = 'hidden';
-            opnInput.name = 'order_product_numbers[]';
-            opnInput.value = productData.opn;
-            createForm.appendChild(opnInput);
-            
-            const nameInput = document.createElement('input');
-            nameInput.type = 'hidden';
-            nameInput.name = 'product_names[]';
-            nameInput.value = productData.name;
-            createForm.appendChild(nameInput);
-
-            const priceInput = document.createElement('input');
-            priceInput.type = 'hidden';
-            priceInput.name = 'product_prices[]';
-            priceInput.value = productData.price;
-            createForm.appendChild(priceInput);
+    function renderTable(orders) {
+        orderTableBody.innerHTML = '';
+        orders.forEach(row => {
+            const tr = document.createElement('tr');
+            let orderIdCellContent;
+            if (row.total_undelivered > 0) {
+                orderIdCellContent = `<a class="order-link" href="#" data-order-id="${row.order_id}" data-customer-id="${row.customer_id}" data-customer-name="${row.customer_name}">${row.order_id}</a>`;
+            } else {
+                orderIdCellContent = `<span class="order-id-completed">${row.order_id}</span>`;
+            }
+            tr.innerHTML = `
+                <td>${orderIdCellContent}</td>
+                <td>${row.customer_id}</td>
+                <td>${row.customer_name}</td>
+                <td>${row.order_date}</td>
+                <td>${row.order_state == 1 ? '納品済' : '未納品'}</td>
+            `;
+            orderTableBody.appendChild(tr);
         });
-    });
+        addEventListenersToOrderLinks();
+    }
+    
+    async function handleSort(e) {
+        const header = e.currentTarget;
+        const sortColumn = header.dataset.sort;
+        const currentDir = header.dataset.dir || 'ASC';
+        const nextDir = (currentDir === 'ASC') ? 'DESC' : 'ASC';
 
-    // ★★★ ここから修正 ★★★
-    // populateProductListが顧客情報を受け取るように変更
-    function populateProductList(products, customerId, customerName) {
-        productListDiv.innerHTML = '';
-        if (products.length === 0) {
-            productListDiv.innerHTML = '<p>この注文に紐づく商品はありません。</p>';
-            return;
+        const searchParams = new URLSearchParams(new FormData(document.getElementById('searchForm')));
+        searchParams.set('sort', sortColumn);
+        searchParams.set('dir', nextDir);
+        searchParams.set('json', '1');
+
+        try {
+            const response = await fetch(`?${searchParams.toString()}`);
+            const sortedOrders = await response.json();
+            renderTable(sortedOrders);
+            updateSortHeaders(header, nextDir);
+        } catch (error) {
+            console.error('並び替えデータの取得に失敗しました:', error);
+            alert('並び替えに失敗しました。');
         }
+    }
+    
+    function updateSortHeaders(activeHeader, direction) {
+        sortableHeaders.forEach(th => {
+            th.classList.remove('sort-asc', 'sort-desc');
+            delete th.dataset.dir;
+        });
+        activeHeader.dataset.dir = direction;
+        activeHeader.classList.add(direction === 'ASC' ? 'sort-asc' : 'sort-desc');
+    }
+
+    function addEventListenersToOrderLinks() {
+        document.querySelectorAll('.order-link').forEach(link => {
+            link.addEventListener('click', handleOrderLinkClick);
+        });
+    }
+
+    async function handleOrderLinkClick(e) {
+        e.preventDefault();
+        const targetLink = e.currentTarget;
+        const orderId = targetLink.dataset.orderId;
+        try {
+            const response = await fetch(`get_order_details.php?order-id=${orderId}`);
+            if (!response.ok) throw new Error('サーバーからの応答が正常ではありません。');
+            const products = await response.json(); 
+            const customerId = targetLink.dataset.customerId;
+            const customerName = targetLink.dataset.customerName;
+            populateProductList(products, customerId, customerName);
+            document.getElementById('popup-title').textContent = `商品選択 (注文ID: ${orderId})`;
+            document.getElementById('product-popup').style.display = 'flex';
+        } catch (error) {
+            console.error('商品データの取得に失敗しました:', error);
+            alert('商品データの取得に失敗しました。');
+        }
+    }
+
+    // --- ポップアップ関連の関数 (変更なし) ---
+    function populateProductList(products, customerId, customerName) {
+        const productListDiv = document.getElementById('popup-product-list');
+        productListDiv.innerHTML = '';
+        if (products.length === 0) { productListDiv.innerHTML = '<p>この注文に紐づく商品はありません。</p>'; return; }
         products.forEach(product => {
             const uniqueKey = `${product.order_id}-${product.order_product_number}`;
             const isSelected = selectedProducts.has(uniqueKey);
-
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
             checkbox.value = product.order_product_number;
-            checkbox.dataset.productName = product.product_name;
-            checkbox.dataset.price = product.product_price;
-            checkbox.dataset.orderId = product.order_id;
-            checkbox.dataset.undelivered = product.undelivered_quantity;
-            // ★★★ ここから修正 ★★★
-            // checkboxに顧客情報を保持させる
-            checkbox.dataset.customerId = customerId;
-            checkbox.dataset.customerName = customerName;
-            // ★★★ ここまで修正 ★★★
+            Object.assign(checkbox.dataset, {
+                productName: product.product_name, price: product.product_price,
+                orderId: product.order_id, undelivered: product.undelivered_quantity,
+                customerId: customerId, customerName: customerName
+            });
             checkbox.checked = isSelected;
-
-            if (!isSelected && product.undelivered_quantity <= 0) {
-                checkbox.disabled = true;
-            }
-
+            if (!isSelected && product.undelivered_quantity <= 0) checkbox.disabled = true;
             const label = document.createElement('label');
             label.className = 'product-item';
             label.appendChild(checkbox);
             const span = document.createElement('span');
             span.textContent = ` ${product.product_name} (未納品: ${product.undelivered_quantity})`;
             label.appendChild(span);
-            
             checkbox.addEventListener('change', handleCheckboxChange);
             productListDiv.appendChild(label);
         });
     }
-
     function handleCheckboxChange(e) {
         const checkbox = e.target;
-        const customerId = checkbox.dataset.customerId;
-        const customerName = checkbox.dataset.customerName;
-
-        // ★★★ ここから修正 ★★★
-        // チェックを入れる瞬間に顧客をチェック・設定する
+        const { customerId, customerName, orderId, undelivered, price, productName } = checkbox.dataset;
         if (checkbox.checked) {
             if (selectedCustomerId === null) {
-                // 最初の選択なら、この顧客で確定
                 selectedCustomerId = customerId;
                 selectedCustomerName = customerName;
             } else if (selectedCustomerId !== customerId) {
-                // 違う顧客を選ぼうとしたら、アラートを出してチェックを元に戻す
                 alert('一度に選択できるのは、同じ顧客の注文のみです。');
-                checkbox.checked = false;
-                return; // 処理を中断
+                checkbox.checked = false; return;
             }
         }
-        // ★★★ ここまで修正 ★★★
-
-        const orderId = checkbox.dataset.orderId;
-        const orderProductNumber = checkbox.value;
-        const productName = checkbox.dataset.productName;
-        const price = checkbox.dataset.price;
-        const undelivered = checkbox.dataset.undelivered;
-        const uniqueKey = `${orderId}-${orderProductNumber}`;
-
+        const uniqueKey = `${orderId}-${checkbox.value}`;
         if (checkbox.checked) {
-            selectedProducts.set(uniqueKey, { 
-                opn: orderProductNumber, 
-                orderId: orderId,
-                name: productName, 
-                price: price,
-                undelivered: undelivered
-            });
+            selectedProducts.set(uniqueKey, { opn: checkbox.value, orderId, name: productName, price, undelivered });
         } else {
             selectedProducts.delete(uniqueKey);
         }
-        
-        // 選択が0になったら顧客情報もリセット
         if (selectedProducts.size === 0) {
             selectedCustomerId = null;
             selectedCustomerName = null;
         }
-        updateCreateButtonState();
-    }
-
-    function updateCreateButtonState() {
         createBtn.disabled = selectedProducts.size === 0;
     }
+
+    // --- フォーム送信・ポップアップ閉じるイベント ---
+    document.getElementById('close-popup-btn').addEventListener('click', () => { document.getElementById('product-popup').style.display = 'none'; });
+    document.getElementById('product-popup').addEventListener('click', (e) => { if (e.target === e.currentTarget) e.currentTarget.style.display = 'none'; });
+    createForm.addEventListener('submit', (e) => {
+        const existingInputs = createForm.querySelectorAll('input[type="hidden"]');
+        existingInputs.forEach(input => input.remove());
+        if (selectedCustomerId) {
+            const customerIdInput = document.createElement('input'); customerIdInput.type = 'hidden'; customerIdInput.name = 'customer_id'; customerIdInput.value = selectedCustomerId; createForm.appendChild(customerIdInput);
+            const customerNameInput = document.createElement('input'); customerNameInput.type = 'hidden'; customerNameInput.name = 'customer_name'; customerNameInput.value = selectedCustomerName; createForm.appendChild(customerNameInput);
+        }
+        selectedProducts.forEach((productData, uniqueKey) => {
+            for (const key in productData) {
+                const input = document.createElement('input'); input.type = 'hidden';
+                const nameMap = { opn: 'order_product_numbers', name: 'product_names', price: 'product_prices', undelivered: 'undelivered_quantities', orderId: 'order_ids' };
+                input.name = `${nameMap[key]}[]`; input.value = productData[key]; createForm.appendChild(input);
+            }
+        });
+    });
+
+    // --- 初期化実行 ---
+    renderTable(initialOrders);
+    sortableHeaders.forEach(header => header.addEventListener('click', handleSort));
 });
 </script>
 </body>

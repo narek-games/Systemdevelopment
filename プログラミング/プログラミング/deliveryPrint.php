@@ -300,49 +300,119 @@ if ($delivery_id !== "") {
                 </th>
                 <th style="width:40px;"></th> <!-- 一番右の細い空白列 -->
             </tr>
-            <?php // 商品は最大5行分表示します。空欄も出力されます。
-            for ($i = 0; $i < 5; $i++): ?>
-                <tr>
-                    <td><?= $i + 1 ?></td>
-                    <td colspan="2" class="item-name"><?php if (isset($items[$i])) echo htmlspecialchars($items[$i]["name"]); ?></td>
-                    <td><?php if (isset($items[$i])) echo $items[$i]["qty"]; ?></td>
-                    <td><?php if (isset($items[$i])) echo '￥' . number_format($items[$i]["price"]); ?></td>
-                    <td class="yen" style="text-align:right;">
-                        <?php // 金額（単価×数量）を表示
-                        if (isset($items[$i]) && $items[$i]["name"] !== "") {
-                            echo '￥' . number_format((int)$items[$i]["price"] * (int)$items[$i]["qty"]);
-                        } ?>
-                    </td>
-                    <td></td> <!-- 一番右の細い空白セル -->
-                </tr>
-            <?php endfor; ?>
-            <!-- 合計行 -->
-            <tr>
-                <td class="big"></td>
-                <td class="big">合　計</td>
-                <td></td>
-                <td class="big-total"><?= $total_qty ?></td>
-                <td></td>
-                <td class="big-total-amount" colspan="1" style="text-align:right;">￥<?= number_format($total_price) ?></td>
-                <td></td> <!-- 合計行も右端空白 -->
-            </tr>
-            <!-- 税率・税込合計金額の行 -->
-            <tr class="tax-row">
-                <th class="tax-label">税率</th>
-                <td style="border-left:2px solid #2196f3;"></td>
-                <td></td>
-                <td class="tax-label" style="border-left:none;">消費税額等</td>
-                <td class="tax-label"></td>
-                <td class="tax-label">税込合計金額</td>
-                <td class="total-amount-cell" colspan="1" style="border-right:2px solid #2196f3; border-bottom:2px solid #2196f3; text-align:right;">￥<?= number_format($total_price) ?></td>
-            </tr>
+            <?php
+            // JSでページ分割表示するため、明細行は全てdata-items属性にJSONで埋め込む
+            $items_json = htmlspecialchars(json_encode($items, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+            ?>
+            <tbody id="detailBody" data-items="<?= $items_json ?>">
+            <!-- JSで明細行を描画 -->
+            </tbody>
+            <!-- 合計行・税率行はJSで描画 -->
         </table>
     </div>
+    <!-- ページ切り替えボタン -->
+    <div id="pageNav" style="text-align:center; margin-top:30px;"></div>
     <!-- 戻る・印刷ボタン -->
-    <div style="text-align:center; margin-top:30px;">
+    <div style="text-align:center; margin-top:10px;">
         <a href="deliveryHome.php"><button class="button-back">戻る</button></a>
         <button class="button-print" onclick="window.print()">印刷</button>
     </div>
 </body>
 
+</body>
+<script>
+// 1ページあたりの明細数
+const PAGE_SIZE = 5;
+const items = JSON.parse(document.getElementById('detailBody').dataset.items || '[]');
+let currentPage = 1;
+const totalPages = Math.max(1, Math.ceil(items.length / PAGE_SIZE));
+
+function renderPage(page) {
+  const tbody = document.getElementById('detailBody');
+  tbody.innerHTML = '';
+  const start = (page - 1) * PAGE_SIZE;
+  const end = start + PAGE_SIZE;
+  let total_qty = 0;
+  let total_price = 0;
+  for (let i = 0; i < PAGE_SIZE; i++) {
+    const idx = start + i;
+    const item = items[idx];
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${idx + 1}</td>
+      <td colspan="2" class="item-name">${item ? escapeHtml(item.name) : ''}</td>
+      <td>${item ? item.qty : ''}</td>
+      <td>${item ? '￥' + numberFormat(item.price) : ''}</td>
+      <td class="yen" style="text-align:right;">${item && item.name ? '￥' + numberFormat(item.price * item.qty) : ''}</td>
+      <td></td>
+    `;
+    tbody.appendChild(tr);
+    if (item) {
+      total_qty += parseInt(item.qty) || 0;
+      total_price += (parseInt(item.price) || 0) * (parseInt(item.qty) || 0);
+    }
+  }
+  // 合計行
+  const trTotal = document.createElement('tr');
+  trTotal.innerHTML = `
+    <td class="big"></td>
+    <td class="big">合　計</td>
+    <td></td>
+    <td class="big-total">${total_qty}</td>
+    <td></td>
+    <td class="big-total-amount" colspan="1" style="text-align:right;">￥${numberFormat(total_price)}</td>
+    <td></td>
+  `;
+  tbody.appendChild(trTotal);
+  // 税率・税込合計金額の行
+  const trTax = document.createElement('tr');
+  trTax.className = 'tax-row';
+  trTax.innerHTML = `
+    <th class="tax-label">税率</th>
+    <td style="border-left:2px solid #2196f3;"></td>
+    <td></td>
+    <td class="tax-label" style="border-left:none;">消費税額等</td>
+    <td class="tax-label"></td>
+    <td class="tax-label">税込合計金額</td>
+    <td class="total-amount-cell" colspan="1" style="border-right:2px solid #2196f3; border-bottom:2px solid #2196f3; text-align:right;">￥${numberFormat(total_price)}</td>
+  `;
+  tbody.appendChild(trTax);
+}
+
+function renderPageNav() {
+  const nav = document.getElementById('pageNav');
+  nav.innerHTML = '';
+  if (totalPages <= 1) return;
+  for (let i = 1; i <= totalPages; i++) {
+    const btn = document.createElement('button');
+    btn.textContent = i + 'ページ目';
+    btn.style.margin = '0 5px';
+    btn.className = 'button-print';
+    if (i === currentPage) {
+      btn.style.background = 'blue';
+      btn.style.color = 'white';
+    }
+    btn.onclick = () => {
+      currentPage = i;
+      renderPage(currentPage);
+      renderPageNav();
+    };
+    nav.appendChild(btn);
+  }
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return str.replace(/[&"'<>]/g, function (m) {
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[m];
+  });
+}
+function numberFormat(num) {
+  return (num||0).toLocaleString('ja-JP');
+}
+
+// 初期表示
+renderPage(currentPage);
+renderPageNav();
+</script>
 </html>

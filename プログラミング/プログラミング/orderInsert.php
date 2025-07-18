@@ -159,20 +159,71 @@ function suggestCustomerName() {
     });
 }
 
+
+// 数値欄に整数のみ入力可（整数以外を入力しようとしたらエラー表示）
+function enforceNumericInput(td) {
+  // 直接入力
+  td.addEventListener('keydown', function(e) {
+    // 数字、Backspace, Delete, Tab, 矢印、Enter, Home, End, Ctrl+A/C/V/Xは許可
+    if (
+      !(
+        (e.key >= '0' && e.key <= '9') ||
+        ["Backspace","Delete","Tab","ArrowLeft","ArrowRight","ArrowUp","ArrowDown","Enter","Home","End"].includes(e.key) ||
+        (e.ctrlKey && ["a","c","v","x","A","C","V","X"].includes(e.key))
+      )
+    ) {
+      alert('数量・単価欄には整数のみ入力できます');
+      e.preventDefault();
+    }
+  });
+  // beforeinput: IMEやドラッグ&ドロップ、貼り付け対応
+  td.addEventListener('beforeinput', function(e) {
+    if (e.inputType === 'insertFromPaste' || e.inputType === 'insertFromDrop' || e.inputType === 'insertText') {
+      let data = e.data;
+      if (typeof data !== 'string') {
+        // 貼り付けやドラッグ時はdataがundefinedなので、clipboardData/dataTransferから取得
+        data = (e.clipboardData && e.clipboardData.getData('text')) || (e.dataTransfer && e.dataTransfer.getData('text')) || '';
+      }
+      if (/\D/.test(data)) {
+        alert('数量・単価欄には整数のみ入力できます');
+        e.preventDefault();
+      }
+    }
+  });
+}
+
+function applyNumericEnforcementToTable() {
+  const rows = document.querySelectorAll('tbody tr');
+  rows.forEach(row => {
+    const tds = row.querySelectorAll('td');
+    if (tds[1]) enforceNumericInput(tds[1]); // 数量
+    if (tds[2]) enforceNumericInput(tds[2]); // 単価
+  });
+}
+
 function submitForm() {
   const rows = document.querySelectorAll("tbody tr");
   const items = [];
-  rows.forEach(row => {
+  for (const row of rows) {
     const cells = row.querySelectorAll("td");
-    if (cells.length < 4) return;
+    if (cells.length < 4) continue;
     const name = cells[0].innerText.trim();
     const quantity = cells[1].innerText.trim();
     const price = cells[2].innerText.trim();
     const remark = cells[3].innerText.trim();
+    // 数量・単価が空でなければ整数かチェック
+    if (quantity && !/^\d+$/.test(quantity)) {
+      alert("数量欄には整数のみ入力してください。");
+      return;
+    }
+    if (price && !/^\d+$/.test(price)) {
+      alert("単価欄には整数のみ入力してください。");
+      return;
+    }
     if (name || quantity || price || remark) {
       items.push({ name, quantity, price, remark });
     }
-  });
+  }
 
   const customerId = document.getElementById("customerId").value.trim();
   if (!customerId || items.length === 0) {
@@ -206,8 +257,15 @@ function addProductRow() {
     newRow.appendChild(td);
   }
   tbody.appendChild(newRow);
+  // 数量・単価欄に数値制限
+  enforceNumericInput(newRow.children[1]);
+  enforceNumericInput(newRow.children[2]);
 }
 </script>
 
+</script>
+
+// 初期行にも数値制限
+window.onload = applyNumericEnforcementToTable;
 </body>
 </html>

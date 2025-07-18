@@ -72,7 +72,7 @@ if (!empty($order_product_numbers)) {
                     </div>
                     <div class="form-group">
                         <label>顧客名</label>
-                        <input type="text" name="customer_name" value="<?= htmlspecialchars($customer_name) ?>">
+                        <input type="text" name="customer_name" class="readonly" value="<?= htmlspecialchars($customer_name) ?>" readonly>
                     </div>
                 </div>
 

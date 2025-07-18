@@ -49,7 +49,7 @@ $orderDetails = $stmt->fetchAll(PDO::FETCH_ASSOC);
   <p>
     顧客ID: <input type="text" value="<?= htmlspecialchars($order['customer_id']) ?>" readonly class="readonly-gray">
     顧客名: <input type="text" value="<?= htmlspecialchars($order['customer_name']) ?>" readonly class="readonly-gray">
-    納品日: <input type="text" name="order_delivered_date" id="deliveryDate" value="<?= htmlspecialchars($order['order_delivered_date']) ?>">
+    納品日: <input type="text" name="order_delivered_date" id="deliveryDate" value="<?= htmlspecialchars($order['order_delivered_date'] ?? '') ?>">
   </p>
 
   <table>

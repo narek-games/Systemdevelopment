@@ -130,7 +130,7 @@ if (isset($_GET['json']) && $_GET['json'] == '1') {
     </div>
 
     <form id="create-delivery-form" action="deliveryInsert.php" method="post">
-        <button class="button back_button" type="button" onclick="location.href='deliveryHome.html'">戻る</button>
+        <button class="button back_button" type="button" onclick="location.href='deliveryHome.php'">戻る</button>
         <button class="button create_button" id="createBtn" type="submit" disabled>作成</button>
     </form>
 

@@ -264,8 +264,9 @@ function addProductRow() {
 </script>
 
 </script>
-
+<script>
 // 初期行にも数値制限
 window.onload = applyNumericEnforcementToTable;
+</script>
 </body>
 </html>

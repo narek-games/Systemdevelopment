@@ -1,91 +1,218 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html>
+
 <head>
-  <meta charset="UTF-8">
-  <title>納品書管理画面</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      padding: 20px;
-    }
-    h1 {
-      font-size: 24px;
-      margin-bottom: 20px;
-    }
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      margin-bottom: 20px;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 8px;
-      text-align: center;
-    }
-    th {
-      background-color: #f4f4f4;
-    }
-    .btn {
-      padding: 10px 30px;
-      font-size: 16px;
-      margin: 10px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-    .btn-back, .btn-new {
-      background-color: #dbe7f9;
-    }
-    .edit a, .delete, .print a {
-      display: inline-block;
-      padding: 4px 10px;
-      border-radius: 4px;
-      font-size: 14px;
-      text-decoration: none;
-    }
-    .edit a {
-      color: blue;
-    }
-    .delete {
-      color: red;
-    }
-    .print a {
-      color: orange;
-    }
-    .note {
-      font-size: 12px;
-      color: gray;
-    }
-  </style>
+    <meta charset="utf-8">
+    <title>納品書管理画面</title>
+    <style>
+        body {
+            font-family: "Hiragino Kaku Gothic ProN", sans-serif;
+            background: #f4f4f4;
+            /*padding: 20px;*/
+            background-color: white;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            color: white;
+            background-color: forestgreen;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            border-radius: 16px;
+        }
+
+        .menu-icon {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .menu-icon div {
+            background-color: white;
+            height: 3px;
+            margin: 4px 0;
+            width: 25px;
+        }
+
+        nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        nav a {
+            color: white;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .menu-icon {
+                display: flex;
+            }
+
+            nav {
+                display: none;
+                flex-direction: column;
+                width: 100%;
+                background-color: blue;
+                padding: 10px 0;
+            }
+
+            nav.show-menu {
+                display: flex;
+            }
+        }
+
+        nav a:hover {
+            background-color: green
+        }
+
+        .show-menu {
+            display: flex;
+        }
+
+
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px 40px;
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        input[type="number"] {
+            width: 100%;
+            padding: 6px;
+            box-sizing: border-box;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+
+        table th,
+        table td {
+            border: 1px solid #999;
+            padding: 8px;
+        }
+
+        .tax-options {
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+        }
+
+        .reset-btn,
+        .submit-btn {
+            width: 150px;
+            padding: 12px;
+            font-size: 16px;
+            background-color: cornflowerblue;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .reset-btn {
+            background-color: whitesmoke;
+        }
+
+        .reset-btn:hover {
+            background: gray;
+        }
+
+        .submit-btn:hover {
+            background: blue;
+        }
+
+        .edit-link {
+            color: blue;
+            text-decoration: underline;
+            font-weight: bold;
+        }
+
+        .delete-link {
+            color: red;
+            text-decoration: underline;
+            font-weight: bold;
+        }
+
+        .print-link {
+            color: black;
+            text-decoration: underline;
+            font-weight: bold;
+        }
+    </style>
 </head>
+
 <body>
+    <header><h1>納品書管理画面</h1></header>
+    <table border="1"><!--枠線を表示-->
+        <tr>
+            <th>納品ID</th>
+            <th>顧客ID</th>
+            <th>更新日</th>
+            <th>顧客名</th>
+            <th></th>
+            <th></th>
+            <th></th>
+        </tr>
+        <tr>
+            <td>DE000001</td>
+            <td>CU000001</td>
+            <td>2022年10月17日</td>
+            <td>大阪情報専門学校</td>
+            <td><a class="edit-link" href="deliveryUpdate.html">編集</a>
+            </td>
+            <td><a class="delete-link" href="#">削除</a>
+            </td>
+            <td><a class="print-link" href="deliveryPrint.html">印刷</a>
+            </td>
+        </tr>
+    </table>
 
-  <h1>納品書管理画面</h1>
+    <div class="buttons">
+        <a href="home.html">
+            <button class="reset-btn">戻る</button>
+        </a>
+        <a href="orderOption.html">
+            <button class="submit-btn">新規納品書作成</button>
+        </a>
 
-  <table>
-    <tr>
-      <th>納品ID</th>
-      <th>顧客ID</th>
-      <th>更新日</th>
-      <th>顧客名</th>
-      <th>編集</th>
-      <th>削除</th>
-      <th>印刷</th>
-    </tr>
-    <tr>
-      <td>DE000001</td>
-      <td>CU000001</td>
-      <td>2022年10月17日</td>
-      <td>大阪情報専門学校</td>
-      <td class="edit"><a href="./deliveryUpdate.html">編集</a></td>
-      <td class="delete">削除</td>
-      <td class="print"><a href="./deliveryPrint.html">印刷</a></td>
-    </tr>
-    <!-- 他の行がここに続く -->
-  </table>
-
-  <a href="./home.html"><button class="btn btn-back">戻る</button></a>
-  <a href="./orderOption.html"><button class="btn btn-new">新規納品書作成</button></a>
 
 </body>
+
 </html>

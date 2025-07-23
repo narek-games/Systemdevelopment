@@ -50,13 +50,47 @@
     .status-pending {
       color: red;
     }
-    .btn {
-      padding: 10px 30px;
-      font-size: 16px;
-      margin-right: 20px;
-      border: 1px solid #aaa;
-      background-color: #dde6f3;
+
+    .search-button{
+      background-color: cornflowerblue;
+      width: 100px;
+      padding: 6px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
       cursor: pointer;
+    }
+
+    .back_button{
+      background-color: whitesmoke;
+      width: 150px;
+      padding: 12px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .create_button {
+      background-color: cornflowerblue;
+      width: 150px;
+      padding: 12px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .create_button:hover{
+      background-color: blue;
+    }
+
+    .search-button:hover{
+      background-color: blue;
+    }
+
+    .back_button:hover{
+      background-color: gray;
     }
   </style>
 </head>
@@ -75,7 +109,7 @@
       <input type="text" id="customer-id" value="">
       <label for="customer-name">顧客名</label>
       <input type="text" id="customer-name" value="">
-      <button class="search-btn">検索</button>
+      <button class="search-button">検索</button>
     </div>
   </div>
 
@@ -90,15 +124,12 @@
       </tr>
     </thead>
     <tbody>
-      <tr><td colspan="5" style="height: 30px;"></td></tr>
-      <tr><td colspan="5" style="height: 30px;"></td></tr>
-      <tr><td colspan="5" style="height: 30px;"></td></tr>
-      <tr><td colspan="5" style="height: 30px;"></td></tr>
+     
     </tbody>
   </table>
 
- <button class="btn" onclick="location.href='deliveryHome.html'">戻る</button>
-  <button class="btn">作成</button>
+ <button class="back_button" onclick="location.href='deliveryHome.html'">戻る</button>
+  <button class="create_button" onclick="location.href='deliveryInsert.html'">作成</button>
 
 </body>
 </html>

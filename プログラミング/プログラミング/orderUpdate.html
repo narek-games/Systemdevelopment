@@ -1,50 +1,189 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
-<meta charset="UTF-8">
-<title>MBSアプリ</title>
+  <meta charset="UTF-8">
+  <title>MBSアプリ - 注文書編集画面</title>
+  <style>
+    /* ページ全体の基本スタイル */
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Hiragino Kaku Gothic ProN", sans-serif;
+      background-color: white;
+    }
+
+    /* ヘッダーのタイトル文字 */
+    header h1 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    /* ヘッダー部分のデザイン */
+    header {
+      position: sticky;
+      top: 0;
+      color: white;
+      background-color: forestgreen;
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      border-radius: 16px;
+    }
+
+    /* ハンバーガーメニューアイコン */
+    .menu-icon {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+      padding: 5px;
+    }
+
+    .menu-icon div {
+      background-color: white;
+      height: 3px;
+      margin: 4px 0;
+      width: 25px;
+    }
+
+    /* ナビゲーションメニュー */
+    nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    nav a {
+      color: white;
+      padding: 8px 16px;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+
+    nav a:hover {
+      background-color: green
+    }
+
+    /* 画面幅が狭いときのメニュー表示 */
+    @media (max-width: 768px) {
+      .menu-icon {
+        display: flex;
+      }
+
+      nav {
+        display: none;
+        flex-direction: column;
+        width: 100%;
+        background-color: blue;
+        padding: 10px 0;
+      }
+
+      nav.show-menu {
+        display: flex;
+      }
+    }
+
+    /* テーブルのデザイン */
+    table {
+      border-collapse: collapse;
+      margin: 0 auto 20px;
+    }
+
+    table th,
+    table td {
+      border: 1px solid #999;
+      padding: 10px;
+      text-align: center;
+    }
+
+    /* 納品済・未納品の状態セルの色分け */
+    .status-green {
+      color: white;
+      background-color: green;
+      padding: 4px 8px;
+      border-radius: 4px;
+      display: inline-block;
+    }
+
+    .status-red {
+      color: white;
+      background-color: orange;
+      padding: 4px 8px;
+      border-radius: 4px;
+      display: inline-block;
+    }
+
+    /* 下部ボタンの配置 */
+    .button-group {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      margin-top: 20px;
+    }
+
+    /* 共通ボタンデザイン */
+    .btn-common {
+      width: 200px;
+      padding: 12px;
+      font-size: 16px;
+      background-color: cornflowerblue;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      cursor: pointer;
+      color: white;
+    }
+
+    .btn-common:hover {
+      background-color: blue;
+    }
+
+    /* 削除ボタン */
+    .btn-red {
+      background: none;
+      border: none;
+      color: red;
+      font-weight: bold;
+      font-size: 16px;
+      cursor: pointer;
+      margin: 10px;
+    }
+
+    /* 行追加ボタン */
+    .btn-plus {
+      background-color: cornflowerblue;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 20px;
+      font-weight: bold;
+      cursor: pointer;
+      margin: 10px;
+    }
+  </style>
 </head>
-<title>注文書編集画面</title>
-<style>
-  body {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    min-height: 100vh;
-    margin: 0;
-  }
-  table, th, td {
-    border: 1px solid #333;
-    border-collapse: collapse;
-  }
-  th, td {
-    padding: 5px 10px;
-    text-align: center;
-  }
-  .btn {
-    width: 170px;
-    height: 40px;
-    font-size: 18px;
-    margin: 10px;
-  }
-  .status-red {
-     color: red;
-  }
-  .status-green {
-    color: green;
-  }
-  .centered {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin: 20px;
-  }
-</style>
-</head>
+
 <body>
-  <h2>注文書編集画面</h2>
-  <!--DBから読み取れるようにする-->
+  <!-- ヘッダー（タイトルとメニュー） -->
+  <header>
+    <h1>注文書編集画面</h1>
+    <div class="menu-icon" onclick="toggleMenu()">
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
+    <nav id="menu">
+      <a href="home.html">HOME</a>
+      <a href="orderInsert.html">注文書作成</a>
+      <a href="deliveryInsert.html">納品書作成</a>
+    </nav>
+  </header>
+
+  <!-- 注文情報の入力欄（IDや日付など） -->
   <p>
     注文ID: <input type="text" value="OR000001" readonly>
     作成日: <input type="text" value="2022年10月16日12時00分00秒" readonly>
@@ -52,150 +191,172 @@
     <input type="radio" name="status" checked>未納品
     <input type="radio" name="status">納品済
   </p>
-
   <p>
     顧客ID: <input type="text" value="CU000001" readonly>
-    顧客名: <input type="text" value="大阪情報専門学校"readonly>
-    納品日: <input type="text" value="2022年10月17日12時00分00秒"readonly>
+    顧客名: <input type="text" value="大阪情報専門学校" readonly>
+    納品日: <input type="text" value="2022年10月17日12時00分00秒" readonly>
   </p>
 
-<div style="width: fit-content; margin: 30px auto; position: relative; text-align: center;">
-  <table>
-    <thead>
-      <tr>
-        <th></th>
-        <th>品名</th>
-        <th>注文数量</th>
-        <th>未納数量</th>
-        <th>単価</th>
-        <th>摘要</th>
-        <th>状態</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!--DB連携できた後に書く-->
-    </tbody>
-  </table>
+  <!-- 注文内容のテーブル（動的に行追加・削除可能） -->
+  <div style="width: fit-content; margin: 30px auto; text-align: center;">
+    <table>
+      <thead>
+        <tr>
+          <th></th>
+          <th>品名</th>
+          <th>注文数量</th>
+          <th>未納数量</th>
+          <th>単価</th>
+          <th>摘要</th>
+          <th>状態</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <!-- 行削除ボタン -->
+    <button class="btn-red" onclick="deleteCheckedRows()">削除</button>
+    <!-- 行追加ボタン -->
+    <button class="btn-plus" onclick="addRow()">＋</button>
+  </div>
 
-  <button
-    style="
-      position: absolute;
-      bottom: -40px;
-      left: 0;
-      width: 70px;
-      height: 30px;
-      font-size: 14px;
-      background-color: red;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;"
-    onclick="deleteCheckedRows()">削除</button>
+  <!-- 下部の戻る・保存ボタン -->
+  <div class="button-group">
+    <button class="btn-common" onclick="location.href='orderHome.html'">戻る</button>
+    <button class="btn-common" onclick="saveTableState()">保存</button>
+  </div>
 
-  <button
-    style="
-      position: absolute;
-      right: 0;
-      bottom: -40px;
-      width: 30px;
-      height: 30px;
-      font-size: 16px;
-      font-weight: bold;
-      border-radius: 5px;
-      border: none;
-      cursor: pointer;"
-    onclick="addRow()">+</button>
-</div>
-
-<p>
-  <button class="btn" onclick="location.href='orderHome.html'">戻る</button>
-  <button class="btn" onclick="saveTableState()">保存</button>
-</p>
-
-<script>
-  //行の追加
-  function addRow() {
-    const table = document.querySelector("table tbody");
-    const newRow = document.createElement("tr");
-    newRow.innerHTML = `
-      <td><input type="checkbox"></td>
-      <td><input type="text" value="" ></td>
-      <td><input type="number" value="" ></td>
-      <td><input type="number" value="" ></td>
-      <td><input type="number" value="" ></td>
-      <td><input type="text" value="" ></td>
-      <td class="status-red"></td>
-    `;
-    table.appendChild(newRow);
-  }
-  //削除
-  function deleteCheckedRows() {
-    if (!confirm("選択した行を削除してもよろしいですか？")) {
-      return; // キャンセルされたら中断
+  <script>
+    // メニューの開閉（スマホ用）
+    function toggleMenu() {
+      const menu = document.getElementById('menu');
+      menu.classList.toggle('show-menu');
     }
 
-    const table = document.querySelector("table tbody");
-    const rows = table.querySelectorAll("tr");
-    rows.forEach(row => {
-      const checkbox = row.querySelector("input[type='checkbox']");
-      if (checkbox && checkbox.checked) {
-        table.removeChild(row);
+    // 未納数量の入力値に応じて状態セルを自動更新
+    function updateStatusOnInput(event) {
+      const row = event.target.closest("tr");
+      const name = row.querySelectorAll("td")[1].querySelector("input").value.trim();
+      const orderQty = row.querySelectorAll("td")[2].querySelector("input").value.trim();
+      const remainQtyInput = row.querySelectorAll("td")[3].querySelector("input");
+      const remainQty = parseInt(remainQtyInput.value);
+      const statusCell = row.querySelectorAll("td")[6];
+
+      if (!name && !orderQty && !remainQtyInput.value) {
+        statusCell.textContent = "";
+        statusCell.className = "";
+        return;
       }
-    });
-  }
-  //保存
-  function saveTableState() {
-    const table = document.querySelector("table tbody");
-    const rows = table.querySelectorAll("tr");
-    const tableData = [];
 
-    rows.forEach(row => {
-      const cells = row.querySelectorAll("td");
-      const remainQty = parseInt(cells[3].querySelector("input").value);
-      const status = remainQty === 0 ? "納品済み" : "未納品";
-      
-      const rowData = {
-        checked: cells[0].querySelector("input[type='checkbox']").checked,
-        name: cells[1].querySelector("input").value,
-        orderQty: cells[2].querySelector("input").value,
-        remainQty: cells[3].querySelector("input").value,
-        price: cells[4].querySelector("input").value,
-        note: cells[5].querySelector("input").value,
-        status: status
-      };
-      tableData.push(rowData);
-    });
+      if (!isNaN(remainQty)) {
+        if (remainQty === 0) {
+          statusCell.textContent = "納品済";
+          statusCell.className = "status-green";
+        } else {
+          statusCell.textContent = "未納品";
+          statusCell.className = "status-red";
+        }
+      }
+    }
 
-    localStorage.setItem("orderTableData", JSON.stringify(tableData));
-    alert("保存しました！");
-  }
-
-  //画面を閉じた際にも状態が保存される
-  function loadTableState() {
-    const tableData = JSON.parse(localStorage.getItem("orderTableData"));
-    if (!tableData) return;
-
-    const table = document.querySelector("table tbody");
-    table.innerHTML = ""; // 初期化
-
-    tableData.forEach(rowData => {
+    // テーブルに新しい行を追加する
+    function addRow(data = {}) {
+      const table = document.querySelector("table tbody");
       const newRow = document.createElement("tr");
+
+      const isEmpty = !data.name && !data.orderQty && !data.remainQty;
+
+      // 状態セルの初期値と色を決定
+      const statusText = isEmpty ? "" :
+        (parseInt(data.remainQty) === 0 ? "納品済" : "未納品");
+      const statusClass = statusText === "納品済" ? "status-green" :
+        statusText === "未納品" ? "status-red" : "";
+
       newRow.innerHTML = `
-        <td><input type="checkbox" ${rowData.checked ? "checked" : ""}></td>
-        <td><input type="text" value="${rowData.name}"></td>
-        <td><input type="number" value="${rowData.orderQty}"></td>
-        <td><input type="number" value="${rowData.remainQty}"></td>
-        <td><input type="number" value="${rowData.price}"></td>
-        <td><input type="text" value="${rowData.note}"></td>
-        <td class="${rowData.status === '納品済み' ? 'status-green' : 'status-red'}">${rowData.status}</td>
+        <td><input type="checkbox" ${data.checked ? "checked" : ""}></td>
+        <td><input type="text" value="${data.name || ""}"></td>
+        <td><input type="number" min="0" value="${data.orderQty || ""}"></td>
+        <td><input type="number" min="0" value="${data.remainQty || ""}"></td>
+        <td><input type="number" min="0" value="${data.price || ""}"></td>
+        <td><input type="text" value="${data.note || ""}"></td>
+        <td class="${statusClass}">${statusText}</td>
       `;
+
+      // 未納数量の入力イベントで状態セルを自動更新
+      const remainQtyInput = newRow.querySelectorAll("td")[3].querySelector("input");
+      remainQtyInput.addEventListener("input", updateStatusOnInput);
+
       table.appendChild(newRow);
-    });
-  }
+    }
 
-  // ページ読み込み時に呼び出す
-  window.onload = loadTableState;
+    // チェックされた行を削除する
+    function deleteCheckedRows() {
+      if (!confirm("選択した行を削除してもよろしいですか？")) return;
+      const table = document.querySelector("table tbody");
+      const rows = table.querySelectorAll("tr");
+      rows.forEach(row => {
+        const checkbox = row.querySelector("input[type='checkbox']");
+        if (checkbox && checkbox.checked) {
+          table.removeChild(row);
+        }
+      });
+    }
 
-</script>
+    // テーブル内容をローカルストレージに保存
+    function saveTableState() {
+      const table = document.querySelector("table tbody");
+      const rows = table.querySelectorAll("tr");
+      const tableData = [];
+
+      rows.forEach(row => {
+        const cells = row.querySelectorAll("td");
+        const name = cells[1].querySelector("input").value.trim();
+        const orderQty = cells[2].querySelector("input").value.trim();
+        const remainQty = cells[3].querySelector("input").value.trim();
+
+        if (!name && !orderQty && !remainQty) return;
+
+        const status = parseInt(remainQty) === 0 ? "納品済" : "未納品";
+
+        const rowData = {
+          checked: cells[0].querySelector("input[type='checkbox']").checked,
+          name: name,
+          orderQty: orderQty,
+          remainQty: remainQty,
+          price: cells[4].querySelector("input").value,
+          note: cells[5].querySelector("input").value,
+          status: status
+        };
+        tableData.push(rowData);
+      });
+
+      localStorage.setItem("orderTableData", JSON.stringify(tableData));
+      alert("保存しました！");
+    }
+
+    // ページ読み込み時にローカルストレージからテーブル内容を復元
+    function loadTableState() {
+      const tableData = JSON.parse(localStorage.getItem("orderTableData"));
+      if (!tableData) return;
+
+      const table = document.querySelector("table tbody");
+      table.innerHTML = "";
+      tableData.forEach(rowData => {
+        addRow(rowData);
+      });
+    }
+
+    // ページ表示時にテーブルを初期化・復元
+    window.onload = function () {
+      loadTableState();
+      addRow({
+        name: "日経コンピュータ　11号",
+        orderQty: 1,
+        remainQty: 0,
+        price: 1300,
+        note: ""
+      });
+    };
+  </script>
 </body>
+
 </html>

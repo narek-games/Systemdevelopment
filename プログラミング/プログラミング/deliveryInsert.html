@@ -5,19 +5,78 @@
     <meta charset="UTF-8">
     <title>納品書作成画面</title>
     <style>
-        body {
-            font-family: "Hiragino Kaku Gothic ProN", sans-serif;
-            background: #f4f4f4;
-            /*padding: 20px;*/
-            background-color: white;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-
-       
 
         h1 {
-            text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 10px
         }
+
+        body {
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .header {
+            background-color: blue;
+            color: white;
+            padding: 10px 20px;
+            font-size: 20px;
+        }
+
+        .container {
+            display: flex;
+            flex: 1;
+            transition: all 0.3s;
+        }
+
+        .sidebar {
+            width: 200px;
+            background-color: #f4f4f4;
+            border-right: 1px solid #ccc;
+            padding: 20px;
+            transition: width 0.3s;
+        }
+
+
+        .sidebar.closed {
+            width: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar li {
+            margin: 10px 0;
+        }
+
+        .sidebar hr {
+            border: none;
+            border-top: 1px solid #aaa;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            transition: margin-left 0.3s;
+        }
+
+        .menu-toggle {
+            margin-bottom: 10px;
+            padding: 5px 10px;
+        }
+
+
+
+
 
         .grid {
             display: grid;
@@ -38,6 +97,11 @@
             width: 100%;
             padding: 6px;
             box-sizing: border-box;
+
+        }
+
+        .readonly {
+            background-color: lightgray
         }
 
         table {
@@ -68,7 +132,7 @@
             width: 150px;
             padding: 12px;
             font-size: 16px;
-            background: #dce9f9;
+            background-color: cornflowerblue;
             border: 1px solid #ccc;
             border-radius: 8px;
             cursor: pointer;
@@ -76,106 +140,141 @@
 
         .reset-btn:hover,
         .submit-btn:hover {
-            background: #bcd4f7;
+            background: blue;
+        }
+
+        .toast {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: #333;
+            color: #fff;
+            padding: 16px 32px;
+            border-radius: 8px;
+            font-size: 18px;
+            z-index: 9999;
+            opacity: 0.95;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            pointer-events: none;
+            animation: fadein 0.2s;
+        }
+
+        @keyframes fadein {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 0.95; transform: translateY(0); }
         }
     </style>
 </head>
 
 <body>
+
+    <!--<header class="header">MBS</header>-->
     <div class="container">
-        <h1>納品書作成画面</h1>
+        <nav class="sidebar" id="sidebar">
+            <ul>
+                <li><a href="#">HOME</a></li>
+                <hr>
+                <li><a href="#">注文書作成</a></li>
+                <hr>
+                <li><a href="#">注文書管理</a></li>
+            </ul>
 
-        <div class="grid">
-            <div class="form-group">
-                <label>納品ID</label>
-                <input type="text" value="DE000001" readonly>
-            </div>
-            <div class="form-group">
-                <label>日付</label>
-                <input type="date" id="deliveryDate">
-            </div>
 
-            <script>
-                window.addEventListener('DOMContentLoaded', () => {
-                    const today = new Date();
-                    const yyyy = today.getFullYear();
-                    const mm = String(today.getMonth() + 1).padStart(2, '0');
-                    const dd = String(today.getDate()).padStart(2, '0');
-                    document.getElementById('deliveryDate').value = `${yyyy}-${mm}-${dd}`;
-                });
-            </script>
+        </nav>
 
-            <div class="form-group">
-                <label>顧客ID</label>
-                <input type="text" value="CU000001" readonly>
-            </div>
-            <div class="form-group">
-                <label>顧客名</label>
-                <input type="text" value="大阪情報専門学校">
-            </div>
-        </div>
+        <main class="main-content">
+            <button class="menu-toggle" onclick="document.getElementById('sidebar').classList.toggle('closed')">
+                <span id="toggleIcon">☰</span>
+            </button>
+            <h1>納品書作成画面</h1>
+            <form id="deliveryForm">
+                <div class="grid">
+                    <div class="form-group">
+                        <label>納品ID</label>
+                        <input type="text" class="readonly" value="DE000001" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>日付</label>
+                        <input type="date" id="deliveryDate">
+                    </div>
 
-        <table border="1" id="itemTable">
-            <thead>
-                <tr>
-                    <th>品名</th>
-                    <th>数量</th>
-                    <th>単価</th>
-                    <th>金額</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr class="item-row">
-                    <td><input type="text" value="日経コンピュータ11月号"></td>
-                    <td><input type="number" value="1" class="qty" oninput="updateRow(this)"></td>
-                    <td><input type="number" value="1300" class="price" oninput="updateRow(this)" readonly></td>
-                    <td><input type="number" value="1300" class="total" readonly></td>
-                </tr>
-                <tr class="item-row">
-                    <td><input type="text" value="日経コンピュータ11月号"></td>
-                    <td><input type="number" value="2" class="qty" oninput="updateRow(this)"></td>
-                    <td><input type="number" value="1300" class="price" oninput="updateRow(this)" readonly></td>
-                    <td><input type="number" value="3000" class="total" readonly></td>
-                </tr>
-                <tr class="item-row">
-                    <td><input type="text" value=""></td>
-                    <td><input type="number" value="" class="qty" oninput="updateRow(this)"></td>
-                    <td><input type="number" value="" class="price" oninput="updateRow(this)"radio></td>
-                    <td><input type="number" value="" class="total" readonly></td>
-                </tr>
-                <tr class="item-row">
-                    <td><input type="text" value=""></td>
-                    <td><input type="number" value="" class="qty" oninput="updateRow(this)"></td>
-                    <td><input type="number" value="" class="price" oninput="updateRow(this)"readonly></td>
-                    <td><input type="number" value="" class="total" readonly></td>
-                </tr>
-                <tr class="item-row">
-                    <td><input type="text" value=""></td>
-                    <td><input type="number" value="" class="qty" oninput="updateRow(this)"></td>
-                    <td><input type="number" value="" class="price" oninput="updateRow(this)"readonly></td>
-                    <td><input type="number" value="" class="total" readonly></td>
-                </tr>
-            </tbody>
-        </table>
+                    <script>
+                        window.addEventListener('DOMContentLoaded', () => {
+                            const today = new Date();
+                            const yyyy = today.getFullYear();
+                            const mm = String(today.getMonth() + 1).padStart(2, '0');
+                            const dd = String(today.getDate()).padStart(2, '0');
+                            document.getElementById('deliveryDate').value = `${yyyy}-${mm}-${dd}`;
+                        });
+                    </script>
 
-        <div class="tax-options">
-            <label><input type="radio" name="tax" value="taxExcluded" checked onclick="updateAll()"> 税抜</label>
-            <label><input type="radio" name="tax" value="taxIncluded" onclick="updateAll()"> 税込</label>
-        </div>
-
-        <div class="buttons">
-            <button type="reset" class="reset-btn">元に戻す</button>
-            <button type="submit" class="submit-btn">保存</button>
-        </div>
-
-        <button onclick="location.href='orderOption.html'" class="submit-btn">
-            注文オプション画面へ
-        </button>
+                    <div class="form-group">
+                        <label>顧客ID</label>
+                        <input type="text" class="readonly" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>顧客名</label>
+                        <input type="text">
+                    </div>
+                </div>
+                <table border="1" id="itemTable">
+                    <thead>
+                        <tr>
+                            <th>品名</th>
+                            <th>数量</th>
+                            <th>単価</th>
+                            <th>金額</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="item-row">
+                            <td><input type="text" value="日経コンピュータ11月号"></td>
+                            <td><input type="number" value="1" class="qty" oninput="updateRow(this)"></td>
+                            <td><input type="number" value="1300" class="price" oninput="updateRow(this)" readonly></td>
+                            <td><input type="number" value="1300" class="total" readonly></td>
+                        </tr>
+                        <tr class="item-row">
+                            <td><input type="text" value="日経コンピュータ11月号"></td>
+                            <td><input type="number" value="2" class="qty" oninput="updateRow(this)"></td>
+                            <td><input type="number" value="1300" class="price" oninput="updateRow(this)" readonly></td>
+                            <td><input type="number" value="3000" class="total" readonly></td>
+                        </tr>
+                        <tr class="item-row">
+                            <td><input type="text" value=""></td>
+                            <td><input type="number" value="" class="qty" oninput="updateRow(this)"></td>
+                            <td><input type="number" value="" class="price" oninput="updateRow(this)" radio></td>
+                            <td><input type="number" value="" class="total" readonly></td>
+                        </tr>
+                        <tr class="item-row">
+                            <td><input type="text" value=""></td>
+                            <td><input type="number" value="" class="qty" oninput="updateRow(this)"></td>
+                            <td><input type="number" value="" class="price" oninput="updateRow(this)" readonly></td>
+                            <td><input type="number" value="" class="total" readonly></td>
+                        </tr>
+                        <tr class="item-row">
+                            <td><input type="text" value=""></td>
+                            <td><input type="number" value="" class="qty" oninput="updateRow(this)"></td>
+                            <td><input type="number" value="" class="price" oninput="updateRow(this)" readonly></td>
+                            <td><input type="number" value="" class="total" readonly></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="tax-options">
+                    <label><input type="radio" name="tax" value="taxExcluded" checked onclick="updateAll()"> 税抜</label>
+                    <label><input type="radio" name="tax" value="taxIncluded" onclick="updateAll()"> 税込</label>
+                </div>
+                <div class="buttons">
+                    <button type="button" class="reset-btn" id="backBtn">戻る</button>
+                    <button type="submit" class="submit-btn">保存</button>
+                </div>
+            </form>
     </div>
-
+    </main>
     <script>
+
+
         const taxRate = 0.1;
-        
+
         function updateRow(input) {
             const row = input.closest('.item-row');
             const qty = parseFloat(row.querySelector('.qty').value) || 0;
@@ -195,6 +294,30 @@
                 updateRow(row.querySelector('.qty'));
             });
         }
+
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message; // メッセージを表示
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 2000);
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            document.querySelector('.submit-btn').addEventListener('click', function (e) {
+                e.preventDefault();
+                showToast('納品書を保存しました');
+                setTimeout(function () {
+                    window.location.href = 'deliveryHome.html';
+                }, 200); // 0.2秒後に遷移
+            });
+            document.getElementById('backBtn').addEventListener('click', function () {
+                window.location.href = 'orderOption.html';
+            });
+        });
+
+
+
     </script>
 </body>
 

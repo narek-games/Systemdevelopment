@@ -177,7 +177,7 @@ $stmt = $pdo->query($sql);
                                 <a class="edit-link" href="orderUpdate.php?order_id=<?= urlencode($row['order_id']) ?>">編集</a>
                             </td>
                             <td>
-                                <a class="delete-link" href="orderDelete.php?order_id=<?= urlencode($row['order_id']) ?>">削除</a>
+                                <a class="delete-link" href="orderDelete.php?order_id=<?= urlencode($row['order_id']) ?>" onclick="return confirm('本当に削除しますか？');">削除</a>
                             </td>
                         </tr>
                     <?php endwhile; ?>

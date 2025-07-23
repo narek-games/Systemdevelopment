@@ -211,18 +211,31 @@ function submitForm() {
     const quantity = cells[1].innerText.trim();
     const price = cells[2].innerText.trim();
     const remark = cells[3].innerText.trim();
-    // 数量・単価が空でなければ整数かチェック
-    if (quantity && !/^\d+$/.test(quantity)) {
+    // 商品名・数量・単価がすべて空ならスキップ
+    if (!(name || quantity || price || remark)) continue;
+    // 商品名・数量・単価は必須
+    if (!name) {
+      alert("商品名を入力してください。");
+      return;
+    }
+    if (!quantity) {
+      alert("数量を入力してください。");
+      return;
+    }
+    if (!price) {
+      alert("単価を入力してください。");
+      return;
+    }
+    // 数量・単価が整数かチェック
+    if (!/^\d+$/.test(quantity)) {
       alert("数量欄には整数のみ入力してください。");
       return;
     }
-    if (price && !/^\d+$/.test(price)) {
+    if (!/^\d+$/.test(price)) {
       alert("単価欄には整数のみ入力してください。");
       return;
     }
-    if (name || quantity || price || remark) {
-      items.push({ name, quantity, price, remark });
-    }
+    items.push({ name, quantity, price, remark });
   }
 
   const customerId = document.getElementById("customerId").value.trim();

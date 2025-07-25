@@ -26,10 +26,10 @@ $delivery_date_for_input = $delivery_date_raw ? substr($delivery_date_raw, 0, 10
 // 明細データ取得
 // =============================
 $items = [];
-if (!empty($delivery_id)) {
-  $sql = "SELECT DISTINCT od.product_name, od.undelivered_quantity, od.product_price, od.product_quantity, od.order_product_number FROM delivery_detail AS dd INNER JOIN order_detail AS od ON dd.order_product_number = od.order_product_number WHERE dd.delivery_id = :delivery_id";
+if (!empty($delivery_id) && !empty($customer_id)) {
+  $sql = "SELECT DISTINCT od.product_name, od.undelivered_quantity, od.product_price, od.product_quantity, od.order_product_number FROM delivery_detail AS dd INNER JOIN order_detail AS od ON dd.order_product_number = od.order_product_number INNER JOIN `order` AS o ON od.order_id = o.order_id WHERE dd.delivery_id = :delivery_id AND o.customer_id = :customer_id";
   $stmt = $pdo->prepare($sql);
-  $stmt->execute([':delivery_id' => $delivery_id]);
+  $stmt->execute([':delivery_id' => $delivery_id, ':customer_id' => $customer_id]);
   $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 ?>

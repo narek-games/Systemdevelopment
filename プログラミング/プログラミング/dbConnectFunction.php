@@ -18,7 +18,7 @@ function getStatistics($keyword = '')
                             customer_id,
                             COALESCE(customer_name, '') AS customer_name,
                             COALESCE(customer_sales, '') AS customer_sales,
-                            COALESCE(ROUND(customer_leadtime / NULLIF(customer_delivery_count, 0), 1), '') AS customer_average_leadtime
+                            COALESCE(ROUND(customer_leadtime / NULLIF(customer_delivery_count, 0), 1), 0) AS customer_average_leadtime
                         FROM customer";
 
         // NULLIF(customer_delivery_count, 0) は、customer_delivery_count が 0 の場合に NULL を返します。

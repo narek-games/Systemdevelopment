@@ -159,14 +159,15 @@ if ($is_ajax_request) {
         } elseif ($stmt->rowCount() === 0) {
             echo '<tr><td colspan="4">該当するデータはありません。</td></tr>';
         } else {
-            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                echo "<tr>
-                        <td>{$row['customer_id']}</td>
-                        <td>{$row['customer_name']}</td>
-                        <td>{$row['customer_sales']}</td>
-                        <td>{$row['customer_average_leadtime']}</td>
-                      </tr>";
-            }
+           while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+    echo "<tr>
+            <td>{$row['customer_id']}</td>
+            <td>{$row['customer_name']}</td>
+            <td>{$row['customer_sales']}</td>
+            <td>" . ($row['customer_average_leadtime'] ?? 0) . "</td>
+          </tr>";
+          }
+
         }
       ?>
     </tbody>
@@ -205,12 +206,13 @@ if ($is_ajax_request) {
  
             data.forEach(row => {
               const tr = document.createElement('tr');
-              tr.innerHTML = `
-                <td>${row.customer_id}</td>
-                <td>${row.customer_name}</td>
-                <td>${row.customer_sales}</td>
-                <td>${row.customer_average_leadtime}</td>
-              `;
+            tr.innerHTML = `
+              <td>${row.customer_id}</td>
+              <td>${row.customer_name}</td>
+              <td>${row.customer_sales}</td>
+              <td>${row.customer_average_leadtime ?? 0}</td>
+            `;
+
               searchResultsBody.appendChild(tr);
             });
           })

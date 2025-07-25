@@ -47,32 +47,29 @@ try {
     }
 
     // 4. 各テーブルを更新するループ処理
-    $sql_detail_insert = "INSERT INTO delivery_detail (delivery_product_number, delivery_id, order_id, order_product_number) VALUES (?, ?, ?, ?)";
+    $sql_detail_insert = "INSERT INTO delivery_detail (delivery_product_number, delivery_id, order_id, order_product_number, delivery_quantity) VALUES (?, ?, ?, ?, ?)";
     $stmt_detail_insert = $pdo->prepare($sql_detail_insert);
     
-    // ★★★ ここからが今回の修正 ★★★
-    // WHERE句に order_id も追加して、更新対象の行を完全に特定する
     $sql_order_update = "UPDATE order_detail SET undelivered_quantity = undelivered_quantity - ? WHERE order_product_number = ? AND order_id = ?";
     $stmt_order_update = $pdo->prepare($sql_order_update);
-    // ★★★ ここまでが今回の修正 ★★★
 
     $affected_order_ids = [];
     $delivery_total_amount = 0;
 
+    // ★★★ ここからが今回の修正 ★★★
+    // 送られてきたデータの構造に合わせて、foreachで正しくループする
     foreach ($items_from_form as $item) {
         $order_id = $item['order_id'];
         $opn = $item['order_product_number'];
+        $price = $item['price'];
+        // 数量を正しく取り出す
         $quantity = $item['quantity'] ?? 0;
-        $price = $item['price'] ?? 0;
 
         if ($quantity <= 0) continue;
         
-        $stmt_detail_insert->execute([$next_dpn, $new_delivery_id, $order_id, $opn]);
+        $stmt_detail_insert->execute([$next_dpn, $new_delivery_id, $order_id, $opn, $quantity]);
         
-        // ★★★ ここからが今回の修正 ★★★
-        // executeに $order_id を追加
         $stmt_order_update->execute([$quantity, $opn, $order_id]);
-        // ★★★ ここまでが今回の修正 ★★★
 
         if (!in_array($order_id, $affected_order_ids)) {
             $affected_order_ids[] = $order_id;
@@ -80,6 +77,7 @@ try {
         $next_dpn++;
         $delivery_total_amount += $quantity * $price;
     }
+    // ★★★ ここまでが今回の修正 ★★★
 
     // 顧客の累計売上を更新
     if ($delivery_total_amount > 0) {

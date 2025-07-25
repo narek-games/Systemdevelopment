@@ -27,7 +27,7 @@ if ($delivery_id !== "") {
         od.product_quantity AS qty,
         od.product_price AS price
     FROM delivery_detail dd
-    INNER JOIN order_detail od ON dd.order_product_number = od.order_product_number
+    INNER JOIN order_detail od ON dd.order_product_number = od.order_product_number AND dd.order_id = od.order_id
     WHERE dd.delivery_id = :delivery_id
     ";
     $stmt = $pdo->prepare($sql);
